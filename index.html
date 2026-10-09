@@ -685,7 +685,7 @@
             gap: 10px;
         }
 
-        /* --- DISEÑO MÓVIL OPTIMIZADO --- */
+        /* --- DISEÑO MÓVIL OPTIMIZADO PARA NOTIFICACIONES --- */
         @media (max-width: 768px) {
             header {
                 padding: 10px;
@@ -709,9 +709,12 @@
                 padding: 4px 8px;
             }
 
+            /* FIX NOTIFICACIONES EN MÓVIL */
             .notif-dropdown {
-                right: -40px;
-                width: 260px;
+                left: 0;
+                right: auto;
+                width: 280px;
+                max-width: 85vw;
             }
 
             .server-selector-bar {
@@ -741,11 +744,10 @@
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.2.4</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.2.5</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Diseño Ajustado:</strong> Botón de versión integrado junto al perfil de usuario (ya no tapa ningún elemento).</li>
-                <li><strong>Visibilidad en Móviles:</strong> Notificaciones y panel adaptados completamente para pantallas táctiles y pequeñas.</li>
-                <li><strong>Avatar Local Permanente:</strong> Conserva las imágenes de perfil sin desconfiguraciones.</li>
+                <li><strong>Desplegable de Notificaciones Corregido:</strong> Alineación perfeccionada para pantallas móviles evitando recortes laterales.</li>
+                <li><strong>Estabilidad del Sistema:</strong> Toda la interfaz se ajusta perfectamente en dispositivos táctiles.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
@@ -844,8 +846,8 @@
         </div>
 
         <div class="header-actions">
-            <!-- BOTÓN DE VERSIÓN AHORA JUNTO A NOTIFICACIONES -->
-            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.2.4 📜</button>
+            <!-- BOTÓN DE VERSIÓN -->
+            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.2.5 📜</button>
 
             <!-- CAMPANA DE NOTIFICACIONES -->
             <div class="notif-wrapper">
@@ -930,7 +932,7 @@
                 <div class="rule-item"><div class="rule-title">14. Prohibición de mendicidad</div><div class="rule-desc">Queda prohibido pedir dinero solo por estar "pobre". Toda solicitud de fondos debe incluir una justificación válida de su uso (proyectos, compras específicas, etc).</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión temporal.</div></div>
                 <div class="rule-item"><div class="rule-title">15. Prohibido promocionar o crear otros servidores</div><div class="rule-desc">Está totalmente prohibido promocionar, publicitar o invitar a miembros del clan a otros servidores de Minecraft, así como crear servidores propios con la intención de competir o llevarse miembros del Clan Ares sin autorización.</div><div class="rule-punishment">Si lo rompes: Advertencia → Revisión → Mute temporal → Expulsión del clan.</div></div>
                 <div class="rule-item"><div class="rule-title">16. Prohibido mencionar</div><div class="rule-desc">Está prohibido mencionar (@mention) a Lider, Reclutadores o Dueños. Queda especialmente prohibido hacer menciones o mencionar repetidamente a una persona.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión del clan.</div></div>
-                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda estrictamente prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
+                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda strictly prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
             </div>
 
             <div id="info-other" class="rules-container" style="display: none;">
