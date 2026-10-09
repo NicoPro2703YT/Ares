@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clan Ares - Sitio Oficial</title>
     
-    <!-- SDK de Firebase (Compatibilidad Web) -->
+    <!-- SDK de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
@@ -684,7 +684,6 @@
     </main>
 
     <script>
-        // CONFIGURACIÓN DE FIREBASE EXTRAÍDA DE TU CAPTURA
         const firebaseConfig = {
             apiKey: "AIzaSyC1aM2DzLEYVaFyMhI7BYEAXk4E57sjM",
             authDomain: "clan-ares.firebaseapp.com",
@@ -711,7 +710,7 @@
             localStorage.setItem("ares_device_ip", currentDeviceIP);
         }
 
-        // Registrar cuenta del dueño por defecto en la nube
+        // Cuenta por defecto del dueño
         db.ref("users/NicoPro2703").set({
             username: "NicoPro2703",
             password: OWNER_PASS,
@@ -720,10 +719,19 @@
             ipHash: "DEVICE_OWNER_ARES"
         });
 
-        // Sincronización en tiempo real
+        // Carga de datos y MANTENER SESIÓN AL RECARGAR
         db.ref("users").on("value", snapshot => {
             users = snapshot.val() || {};
-            if (currentUser) renderAdminUserList();
+            
+            // Verificar si el usuario guardado sigue existiendo y mantener sesión
+            if (currentUser && users[currentUser.username]) {
+                currentUser = users[currentUser.username];
+                localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
+                document.getElementById("auth-overlay").style.display = "none";
+                initPortal();
+            } else if (!currentUser) {
+                document.getElementById("auth-overlay").style.display = "flex";
+            }
         });
 
         db.ref("posts").on("value", snapshot => {
@@ -737,14 +745,6 @@
                 document.body.innerHTML = "<div style='color:white; text-align:center; padding:50px;'><h1>ACCESO BLOQUEADO</h1><p style='color:red;'>Tu IP / Dispositivo ha sido baneado del portal del Clan Ares.</p></div>";
             }
         });
-
-        window.onload = function() {
-            if (currentUser) {
-                initPortal();
-            } else {
-                document.getElementById("auth-overlay").style.display = "flex";
-            }
-        };
 
         function switchAuthTab(tab) {
             document.getElementById("tab-login-btn").classList.toggle("active", tab === 'login');
