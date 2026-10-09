@@ -65,7 +65,7 @@
             box-shadow: 0 0 15px var(--orange-glow);
         }
 
-        /* --- MODAL NOTAS DE LA VERSIÓN --- */
+        /* --- MODALES --- */
         #version-modal, #rickroll-modal {
             position: fixed;
             top: 0;
@@ -582,24 +582,24 @@
 </head>
 <body>
 
-    <!-- INSIGNIA DE VERSIÓN (ESQUINA SUPERIOR DERECHA) -->
-    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.0 📜</div>
+    <!-- INSIGNIA DE VERSIÓN -->
+    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.1 📜</div>
 
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.1.0</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.1.1</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
+                <li><strong>Publicación Restringida:</strong> Reclutadores excluidos de publicar mensajes o anuncios.</li>
+                <li><strong>Sincronización de Contraseñas:</strong> Permisos aprobados por el Dueño se actualizan en tiempo real para Reclutadores.</li>
                 <li><strong>Visibilidad de Rangos Restringida:</strong> Columna de roles visible únicamente para Líderes y Dueño.</li>
-                <li><strong>Sistema de Permisos de Contraseña:</strong> Reclutadores, Comandantes y Líderes pueden solicitar ver contraseñas con aprobación en tiempo real del Dueño.</li>
-                <li><strong>Protección contra Clones "Ares":</strong> Detección automática del nombre Ares en el registro con reproducción forzada de video anticlones.</li>
-                <li><strong>Base de Datos en la Nube:</strong> Sincronización continua de usuarios, avisos y sanciones en Firebase.</li>
+                <li><strong>Protección contra Clones "Ares":</strong> Detección automática del nombre Ares en el registro con video forzado.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
     </div>
 
-    <!-- MODAL RICKROLL (PROTECCIÓN NOMBRE ARES) -->
+    <!-- MODAL RICKROLL -->
     <div id="rickroll-modal">
         <div class="rickroll-card">
             <h3 style="color:var(--orange-primary); margin-bottom:15px;">⚠️ ACCESO NO PERMITIDO</h3>
@@ -773,7 +773,8 @@
                 <div id="requests-list"></div>
             </div>
 
-            <div class="admin-box">
+            <!-- PUBLICAR MENSAJE OFICIAL (OCULTO PARA RECLUTADORES) -->
+            <div class="admin-box" id="publish-box">
                 <h3>Publicar Mensaje Oficial</h3>
                 <div class="form-group">
                     <label>Tipo de Publicación</label>
@@ -858,7 +859,7 @@
     </main>
 
     <script>
-        // BLOQUEO DE INSPECCIÓN Y CLIC DERECHO
+        // BLOQUEO DE INSPECCIÓN
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', event => {
             if (event.key === "F12" || 
@@ -905,7 +906,7 @@
             ipHash: "DEVICE_OWNER_ARES"
         });
 
-        // Carga de datos y MANTENER SESIÓN
+        // Carga de datos
         db.ref("users").on("value", snapshot => {
             users = snapshot.val() || {};
             if (currentUser && users[currentUser.username]) {
@@ -930,7 +931,7 @@
             }
         });
 
-        // Escuchar solicitudes de contraseña
+        // Sincronización en tiempo real de permisos de contraseña
         db.ref("passRequests").on("value", snapshot => {
             passRequests = snapshot.val() || {};
             if (currentUser && currentUser.username.toLowerCase() === "nicopro2703") {
@@ -943,7 +944,7 @@
             document.getElementById("version-modal").style.display = show ? "flex" : "none";
         }
 
-        // LÓGICA DE RICKROLL Y BUCLE DE VIDEO
+        // LÓGICA DE RICKROLL
         const rickrollVideo = document.getElementById("rickroll-video");
         rickrollVideo.onended = function() {
             const btn = document.getElementById("btn-skip-rickroll");
@@ -1045,11 +1046,19 @@
 
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
             const isLeader = currentUser.role.includes("Líder");
+            const isReclutador = currentUser.role.includes("Reclutador");
 
             if (isOwner || isLeader) {
                 document.getElementById("version-badge").style.display = "block";
             } else {
                 document.getElementById("version-badge").style.display = "none";
+            }
+
+            // Ocultar caja de publicar si es Reclutador
+            if (isReclutador) {
+                document.getElementById("publish-box").style.display = "none";
+            } else {
+                document.getElementById("publish-box").style.display = "block";
             }
 
             if (isOwner) {
@@ -1215,16 +1224,15 @@
             alert("Publicado con éxito en la nube.");
         }
 
-        // RENDERIZADO DE TABLA DE MIEMBROS CON PERMISOS Y VISIBILIDAD DE RANGOS
+        // TABLA DE MIEMBROS CON SINCRONIZACIÓN EN TIEMPO REAL
         function renderAdminUserList() {
             const tbody = document.getElementById("user-admin-list");
             tbody.innerHTML = "";
 
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
             const isLeader = currentUser.role.includes("Líder");
-            const canSeeRoles = isOwner || isLeader; // Solo Dueño y Líder ven rangos
+            const canSeeRoles = isOwner || isLeader;
 
-            // Mostrar/ocultar encabezado de rango
             document.getElementById("th-rango").style.display = canSeeRoles ? "table-cell" : "none";
 
             Object.values(users).forEach(u => {
@@ -1232,16 +1240,16 @@
 
                 const tr = document.createElement("tr");
 
-                // Lógica de visualización de contraseña con permiso
                 let passDisplay = "••••••••";
                 let passReqKey = `${currentUser.username}_${u.username}`;
-                
+                let requestState = passRequests[passReqKey] ? passRequests[passReqKey].status : null;
+
                 if (isOwner) {
                     passDisplay = u.password;
-                } else if (passRequests[passReqKey] === "APPROVED") {
-                    passDisplay = u.password;
-                } else if (passRequests[passReqKey] === "PENDING") {
-                    passDisplay = "<span style='color:var(--gold); font-size:0.8em;'>Pendiente...</span>";
+                } else if (requestState === "APPROVED") {
+                    passDisplay = `<span style="color:#2ecc71; font-weight:bold;">${u.password}</span>`;
+                } else if (requestState === "PENDING") {
+                    passDisplay = "<span style='color:var(--gold); font-size:0.8em;'>Pendiente de aprobación...</span>";
                 } else {
                     passDisplay = `<button class="btn-action btn-pass" onclick="requestPassPermission('${u.username}')">Ver Contraseña</button>`;
                 }
@@ -1282,7 +1290,6 @@
             });
         }
 
-        // SOLICITAR PERMISO PARA VER CONTRASEÑA
         function requestPassPermission(targetUser) {
             let reqKey = `${currentUser.username}_${targetUser}`;
             db.ref("passRequests/" + reqKey).set({
@@ -1290,10 +1297,9 @@
                 target: targetUser,
                 status: "PENDING"
             });
-            alert("Solicitud enviada al Dueño (NicoPro2703). Se mostrará en cuanto la apruebe.");
+            alert("Solicitud enviada a NicoPro2703. En cuanto la acepte, verás la contraseña aquí en tiempo real.");
         }
 
-        // RENDERIZAR BANNER DE NOTIFICACIONES PARA EL DUEÑO
         function renderOwnerRequests() {
             const list = document.getElementById("requests-list");
             list.innerHTML = "";
@@ -1309,7 +1315,7 @@
                 const item = document.createElement("div");
                 item.className = "request-item";
                 item.innerHTML = `
-                    <span style="font-size:0.9em;">El usuario <strong>${req.requester}</strong> solicitó ver la contraseña de <strong>${req.target}</strong>.</span>
+                    <span style="font-size:0.9em;">El usuario <strong>${req.requester}</strong> solicita ver la contraseña de <strong>${req.target}</strong>.</span>
                     <div>
                         <button class="btn-action" style="background:#27ae60; color:white; margin-right:5px;" onclick="respondPassRequest('${key}', 'APPROVED')">Aceptar</button>
                         <button class="btn-action btn-ban" onclick="respondPassRequest('${key}', 'REJECTED')">Rechazar</button>
