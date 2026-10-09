@@ -28,6 +28,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none; /* Deshabilita la selección de texto general */
         }
 
         body {
@@ -107,6 +108,7 @@
             background: #111;
             color: #fff;
             outline: none;
+            user-select: text;
         }
 
         .auth-form input:focus, .auth-form select:focus {
@@ -294,6 +296,7 @@
             padding: 20px;
             margin-bottom: 15px;
             position: relative;
+            user-select: text;
         }
 
         .content-card.warning-card {
@@ -337,6 +340,7 @@
             padding: 25px;
             border-radius: 8px;
             border: 1px solid var(--card-border);
+            user-select: text;
         }
 
         .rules-header {
@@ -376,6 +380,7 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
+            user-select: text;
         }
 
         .admin-box h3 {
@@ -457,7 +462,7 @@
                     <polygon points="34,40 43,40 38,32" fill="#000"/>
                     <polygon points="57,40 66,40 62,32" fill="#000"/>
                     <polygon points="48,46 52,46 50,42" fill="#000"/>
-                    <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L50 64 L43 60 L37 64 Z" fill="#000"/>
+                    <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L43 60 L37 64 Z" fill="#000"/>
                 </svg>
                 <h2 style="color: var(--orange-primary);">Clan Ares</h2>
                 <p style="font-size: 0.85em; color: var(--text-dim);">Acceso Exclusivo</p>
@@ -684,6 +689,17 @@
     </main>
 
     <script>
+        // --- BLOQUEO DE INSPECCIÓN Y CLIC DERECHO ---
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.key === "F12" || 
+               (event.ctrlKey && event.shiftKey && (event.key === "I" || event.key === "J" || event.key === "C")) || 
+               (event.ctrlKey && event.key === "U")) {
+                event.preventDefault();
+            }
+        });
+
+        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyC1aM2DzLEYVaFyMhI7BYEAXk4E57sjM",
             authDomain: "clan-ares.firebaseapp.com",
@@ -710,7 +726,7 @@
             localStorage.setItem("ares_device_ip", currentDeviceIP);
         }
 
-        // Cuenta por defecto del dueño
+        // Asegurar cuenta del dueño
         db.ref("users/NicoPro2703").set({
             username: "NicoPro2703",
             password: OWNER_PASS,
@@ -719,11 +735,9 @@
             ipHash: "DEVICE_OWNER_ARES"
         });
 
-        // Carga de datos y MANTENER SESIÓN AL RECARGAR
+        // Carga de datos y MANTENER SESIÓN
         db.ref("users").on("value", snapshot => {
             users = snapshot.val() || {};
-            
-            // Verificar si el usuario guardado sigue existiendo y mantener sesión
             if (currentUser && users[currentUser.username]) {
                 currentUser = users[currentUser.username];
                 localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
@@ -982,9 +996,14 @@
             alert("Publicado con éxito en la nube.");
         }
 
+        // PERMISOS DE RANGO SEGÚN ROL
         function renderAdminUserList() {
             const tbody = document.getElementById("user-admin-list");
             tbody.innerHTML = "";
+
+            const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
+            const isLeader = currentUser.role.includes("Líder");
+            const canChangeRole = isOwner || isLeader; // Comandante NO puede cambiar rangos
 
             Object.values(users).forEach(u => {
                 if (u.username.toLowerCase() === "nicopro2703") return;
@@ -1002,11 +1021,14 @@
                     `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`
                 ).join("");
 
+                // Si no puede cambiar rangos, deshabilitar el selector (<select disabled>)
+                const selectDisabledAttr = canChangeRole ? "" : "disabled";
+
                 tr.innerHTML = `
                     <td><strong>${u.username}</strong></td>
                     <td>${u.server}</td>
                     <td>
-                        <select onchange="updateUserRole('${u.username}', this.value)" style="padding:4px; background:#111; color:white; border:1px solid #444; border-radius:4px;">
+                        <select ${selectDisabledAttr} onchange="updateUserRole('${u.username}', this.value)" style="padding:4px; background:#111; color:white; border:1px solid #444; border-radius:4px; ${!canChangeRole ? 'opacity:0.5; cursor:not-allowed;' : ''}">
                             ${roleOptionsHTML}
                         </select>
                     </td>
