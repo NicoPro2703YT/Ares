@@ -633,14 +633,14 @@
 <body>
 
     <!-- INSIGNIA DE VERSIÓN -->
-    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.4 📜</div>
+    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.5 📜</div>
 
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.1.4</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.1.5</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Video Anticlones Local:</strong> Integrado el archivo <code>videoplayback.mp4</code> para restricciones de nombres "Ares".</li>
+                <li><strong>Video Anticlones Blindado:</strong> El video <code>videoplayback.mp4</code> ya no se puede pausar ni silenciar.</li>
                 <li><strong>Expiración de Contraseñas (5 Minutos):</strong> Los permisos aceptados se ocultan automáticamente tras 5 minutos.</li>
                 <li><strong>Diseño Responsive Móvil:</strong> Paneles y controles optimizados para teléfonos.</li>
             </ul>
@@ -648,12 +648,12 @@
         </div>
     </div>
 
-    <!-- MODAL RICKROLL (CON videoplayback.mp4) -->
+    <!-- MODAL RICKROLL (BLINDADO: SIN CONTROLES NATIVOS, AUDIO FORZADO) -->
     <div id="rickroll-modal">
         <div class="rickroll-card">
             <h3 style="color:var(--orange-primary); margin-bottom:15px;">⚠️ ACCESO NO PERMITIDO</h3>
             <p style="font-size:0.9em; color:var(--text-dim); margin-bottom:15px;">Intentaste registrarte con el nombre del Clan/Dueño. Debes ver el video completo para poder reintentar con otro nombre.</p>
-            <video id="rickroll-video" width="100%" controls style="border-radius:8px; border:1px solid var(--orange-primary);">
+            <video id="rickroll-video" width="100%" autoplay style="border-radius:8px; border:1px solid var(--orange-primary); pointer-events: none;">
                 <source src="videoplayback.mp4" type="video/mp4">
                 Tu navegador no soporta el reproductor de video.
             </video>
@@ -994,8 +994,23 @@
             document.getElementById("version-modal").style.display = show ? "flex" : "none";
         }
 
-        // LÓGICA DE RICKROLL
+        // LÓGICA DE RICKROLL BLINDADA (SIN PAUSA NI SILENCIO)
         const rickrollVideo = document.getElementById("rickroll-video");
+
+        // Forzar reproducción y evitar silencio o pausa por parte del usuario
+        rickrollVideo.addEventListener('pause', function() {
+            if (document.getElementById("rickroll-modal").style.display === "flex") {
+                rickrollVideo.play();
+            }
+        });
+
+        rickrollVideo.addEventListener('volumechange', function() {
+            if (rickrollVideo.muted || rickrollVideo.volume < 1) {
+                rickrollVideo.muted = false;
+                rickrollVideo.volume = 1;
+            }
+        });
+
         rickrollVideo.onended = function() {
             const btn = document.getElementById("btn-skip-rickroll");
             btn.disabled = false;
@@ -1045,6 +1060,8 @@
 
             if (usernameInput.toLowerCase().includes("ares")) {
                 document.getElementById("rickroll-modal").style.display = "flex";
+                rickrollVideo.muted = false;
+                rickrollVideo.volume = 1;
                 rickrollVideo.play();
                 const btn = document.getElementById("btn-skip-rickroll");
                 btn.disabled = true;
