@@ -633,16 +633,16 @@
 <body>
 
     <!-- INSIGNIA DE VERSIÓN -->
-    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.5 📜</div>
+    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.6 📜</div>
 
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.1.5</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.1.6</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Video Anticlones Blindado:</strong> El video <code>videoplayback.mp4</code> ya no se puede pausar ni silenciar.</li>
-                <li><strong>Expiración de Contraseñas (5 Minutos):</strong> Los permisos aceptados se ocultan automáticamente tras 5 minutos.</li>
-                <li><strong>Diseño Responsive Móvil:</strong> Paneles y controles optimizados para teléfonos.</li>
+                <li><strong>Nuevo Logotipo (AresHalloween.png):</strong> Se actualizó la imagen del logotipo oficial en el portal de acceso y la cabecera.</li>
+                <li><strong>Video Anticlones Blindado:</strong> Reproducción automática forzada sin opción a pausar o silenciar.</li>
+                <li><strong>Expiración de Contraseñas (5 Minutos):</strong> Permisos de visualización con caducidad automática.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
@@ -665,17 +665,8 @@
     <div id="auth-overlay">
         <div class="auth-card">
             <div style="margin-bottom:15px;">
-                <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="50" r="48" fill="#000" stroke="#ff6600" stroke-width="3"/>
-                    <path d="M50 12 C53 6, 58 4, 60 2 C55 4, 52 7, 50 12 Z" fill="#2e7d32"/>
-                    <path d="M22 50 Q22 22 50 22 Q78 22 78 50 Q78 78 50 78 Q22 78 22 50 Z" fill="#e67e22" stroke="#ff6600" stroke-width="2"/>
-                    <path d="M32 50 Q32 28 50 28 Q68 28 68 50 Q68 72 50 72 Q32 72 32 50 Z" fill="#d35400"/>
-                    <polygon points="34,40 43,40 38,32" fill="#000"/>
-                    <polygon points="57,40 66,40 62,32" fill="#000"/>
-                    <polygon points="48,46 52,46 50,42" fill="#000"/>
-                    <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L50 64 L43 60 L37 64 Z" fill="#000"/>
-                </svg>
-                <h2 style="color: var(--orange-primary);">Clan Ares</h2>
+                <img src="AresHalloween.png" class="brand-logo" alt="Logo Clan Ares">
+                <h2 style="color: var(--orange-primary); margin-top: 5px;">Clan Ares</h2>
                 <p style="font-size: 0.85em; color: var(--text-dim);">Acceso Exclusivo</p>
             </div>
 
@@ -722,16 +713,7 @@
 
     <header>
         <div class="brand-container">
-            <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="48" fill="#000" stroke="#ff6600" stroke-width="3"/>
-                <path d="M50 12 C53 6, 58 4, 60 2 C55 4, 52 7, 50 12 Z" fill="#2e7d32"/>
-                <path d="M22 50 Q22 22 50 22 Q78 22 78 50 Q78 78 50 78 Q22 78 22 50 Z" fill="#e67e22" stroke="#ff6600" stroke-width="2"/>
-                <path d="M32 50 Q32 28 50 28 Q68 28 68 50 Q68 72 50 72 Q32 72 32 50 Z" fill="#d35400"/>
-                <polygon points="34,40 43,40 38,32" fill="#000"/>
-                <polygon points="57,40 66,40 62,32" fill="#000"/>
-                <polygon points="48,46 52,46 50,42" fill="#000"/>
-                <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L50 64 L43 60 L37 64 Z" fill="#000"/>
-            </svg>
+            <img src="AresHalloween.png" class="brand-logo" alt="Logo Clan Ares">
             <div class="brand-title">
                 <h1>CLAN ARES</h1>
                 <p style="font-size: 0.8em; color: var(--text-dim);">Portal Oficial de Miembros</p>
@@ -997,7 +979,6 @@
         // LÓGICA DE RICKROLL BLINDADA (SIN PAUSA NI SILENCIO)
         const rickrollVideo = document.getElementById("rickroll-video");
 
-        // Forzar reproducción y evitar silencio o pausa por parte del usuario
         rickrollVideo.addEventListener('pause', function() {
             if (document.getElementById("rickroll-modal").style.display === "flex") {
                 rickrollVideo.play();
@@ -1422,7 +1403,12 @@
             const tabs = ['anuncios', 'advertencias', 'informacion', 'admin'];
             tabs.forEach(t => {
                 const content = document.getElementById("tab-" + t);
-                if (content) content.classList.remove("active");
+                if (content) content.classList.0 ? content.classList.remove("active") : content.classList.remove("active");
+            });
+
+            // Corrección limpia para limpiar clases
+            tabs.forEach(t => {
+                document.getElementById("tab-" + t).classList.remove("active");
             });
 
             const btns = document.querySelectorAll(".nav-tabs .tab-btn");
