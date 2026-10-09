@@ -633,29 +633,28 @@
 <body>
 
     <!-- INSIGNIA DE VERSIÓN -->
-    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.3 📜</div>
+    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.4 📜</div>
 
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.1.3</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.1.4</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Expiración de Contraseñas (5 Minutos):</strong> Los permisos aceptados para ver contraseñas expiran y se ocultan automáticamente tras 5 minutos.</li>
-                <li><strong>Diseño Responsive Móvil:</strong> Paneles y controles adaptados perfectamente a pantallas de teléfonos.</li>
-                <li><strong>Publicación Restringida:</strong> Reclutadores excluidos de publicar mensajes o anuncios.</li>
-                <li><strong>Protección contra Clones "Ares":</strong> Detección automática del nombre Ares con reproductor forzado.</li>
+                <li><strong>Video Anticlones Local:</strong> Integrado el archivo <code>videoplayback.mp4</code> para restricciones de nombres "Ares".</li>
+                <li><strong>Expiración de Contraseñas (5 Minutos):</strong> Los permisos aceptados se ocultan automáticamente tras 5 minutos.</li>
+                <li><strong>Diseño Responsive Móvil:</strong> Paneles y controles optimizados para teléfonos.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
     </div>
 
-    <!-- MODAL RICKROLL -->
+    <!-- MODAL RICKROLL (CON videoplayback.mp4) -->
     <div id="rickroll-modal">
         <div class="rickroll-card">
             <h3 style="color:var(--orange-primary); margin-bottom:15px;">⚠️ ACCESO NO PERMITIDO</h3>
             <p style="font-size:0.9em; color:var(--text-dim); margin-bottom:15px;">Intentaste registrarte con el nombre del Clan/Dueño. Debes ver el video completo para poder reintentar con otro nombre.</p>
             <video id="rickroll-video" width="100%" controls style="border-radius:8px; border:1px solid var(--orange-primary);">
-                <source src="https://shattereddisk.github.io/rickroll/rickroll.mp4" type="video/mp4">
+                <source src="videoplayback.mp4" type="video/mp4">
                 Tu navegador no soporta el reproductor de video.
             </video>
             <button id="btn-skip-rickroll" class="btn-close-modal" disabled onclick="closeRickrollModal()" style="margin-top:15px; width:100%;">Viendo video... (Debes esperar al final)</button>
@@ -1294,7 +1293,6 @@
                 
                 let isApproved = false;
                 if (reqData && reqData.status === "APPROVED") {
-                    // Validar si pasaron menos de 5 minutos (300,000 milisegundos)
                     const FIVE_MINUTES = 5 * 60 * 1000;
                     if (Date.now() - reqData.timestamp < FIVE_MINUTES) {
                         isApproved = true;
