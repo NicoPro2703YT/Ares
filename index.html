@@ -28,7 +28,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none; /* Deshabilita la selección de texto general */
+            user-select: none;
         }
 
         body {
@@ -37,6 +37,106 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        /* --- BOTÓN DE VERSIÓN EXCLUSIVO (LÍDER/DUEÑO) --- */
+        #version-badge {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 102, 0, 0.15);
+            border: 1px solid var(--orange-primary);
+            color: var(--orange-glow);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.2);
+            display: none; /* Se activa mediante JS si es Dueño/Líder */
+        }
+
+        #version-badge:hover {
+            background: var(--orange-primary);
+            color: #fff;
+            box-shadow: 0 0 15px var(--orange-glow);
+        }
+
+        /* --- MODAL NOTAS DE LA VERSIÓN --- */
+        #version-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .version-card {
+            background: var(--card-bg);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 0 30px rgba(243, 156, 18, 0.3);
+            user-select: text;
+        }
+
+        .version-card h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .version-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .version-list li {
+            margin-bottom: 12px;
+            font-size: 0.9em;
+            color: var(--text-light);
+            line-height: 1.4;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .version-list li::before {
+            content: "⚡";
+            position: absolute;
+            left: 0;
+            color: var(--orange-primary);
+        }
+
+        .btn-close-modal {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            float: right;
+            font-weight: bold;
+        }
+
+        .btn-close-modal:hover {
+            background: var(--red-alert);
         }
 
         /* PANTALLA LOGIN / REGISTRO */
@@ -450,6 +550,25 @@
 </head>
 <body>
 
+    <!-- INSIGNIA DE VERSIÓN (ESQUINA SUPERIOR DERECHA) -->
+    <div id="version-badge" onclick="toggleVersionModal(true)">v1.0.0 📜</div>
+
+    <!-- MODAL NOVEDADES DE LA VERSIÓN -->
+    <div id="version-modal">
+        <div class="version-card">
+            <h3><span>Novedades v1.0.0</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <ul class="version-list">
+                <li><strong>Base de Datos en la Nube:</strong> Integración completa con Firebase Realtime Database para sincronización global.</li>
+                <li><strong>Gestión de Roles Segura:</strong> Comandantes con permisos restringidos (solo banear IP, sin cambiar rangos).</li>
+                <li><strong>Protección de Código:</strong> Bloqueo de inspección de código (F12, Clic derecho y combos de teclado).</li>
+                <li><strong>Mantenimiento de Sesión:</strong> Corrección del cierre de sesión automático al recargar la página.</li>
+                <li><strong>Multiservidor:</strong> Soporte dinámico para NauticMC, OlimpoCraft y MineVoid.</li>
+            </ul>
+            <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
+            <div style="clear:both;"></div>
+        </div>
+    </div>
+
     <!-- OVERLAY AUTENTICACIÓN -->
     <div id="auth-overlay">
         <div class="auth-card">
@@ -462,7 +581,7 @@
                     <polygon points="34,40 43,40 38,32" fill="#000"/>
                     <polygon points="57,40 66,40 62,32" fill="#000"/>
                     <polygon points="48,46 52,46 50,42" fill="#000"/>
-                    <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L43 60 L37 64 Z" fill="#000"/>
+                    <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L50 64 L43 60 L37 64 Z" fill="#000"/>
                 </svg>
                 <h2 style="color: var(--orange-primary);">Clan Ares</h2>
                 <p style="font-size: 0.85em; color: var(--text-dim);">Acceso Exclusivo</p>
@@ -519,7 +638,7 @@
                 <polygon points="34,40 43,40 38,32" fill="#000"/>
                 <polygon points="57,40 66,40 62,32" fill="#000"/>
                 <polygon points="48,46 52,46 50,42" fill="#000"/>
-                <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L50 64 L43 60 L37 64 Z" fill="#000"/>
+                <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L43 60 L37 64 Z" fill="#000"/>
             </svg>
             <div class="brand-title">
                 <h1>CLAN ARES</h1>
@@ -689,7 +808,7 @@
     </main>
 
     <script>
-        // --- BLOQUEO DE INSPECCIÓN Y CLIC DERECHO ---
+        // BLOQUEO DE INSPECCIÓN
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', event => {
             if (event.key === "F12" || 
@@ -726,7 +845,7 @@
             localStorage.setItem("ares_device_ip", currentDeviceIP);
         }
 
-        // Asegurar cuenta del dueño
+        // Cuenta por defecto del dueño
         db.ref("users/NicoPro2703").set({
             username: "NicoPro2703",
             password: OWNER_PASS,
@@ -759,6 +878,10 @@
                 document.body.innerHTML = "<div style='color:white; text-align:center; padding:50px;'><h1>ACCESO BLOQUEADO</h1><p style='color:red;'>Tu IP / Dispositivo ha sido baneado del portal del Clan Ares.</p></div>";
             }
         });
+
+        function toggleVersionModal(show) {
+            document.getElementById("version-modal").style.display = show ? "flex" : "none";
+        }
 
         function switchAuthTab(tab) {
             document.getElementById("tab-login-btn").classList.toggle("active", tab === 'login');
@@ -834,6 +957,14 @@
             document.getElementById("display-role").innerText = currentUser.role;
 
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
+            const isLeader = currentUser.role.includes("Líder");
+
+            // Mostrar insignia de versión ÚNICAMENTE a Dueño o Líder
+            if (isOwner || isLeader) {
+                document.getElementById("version-badge").style.display = "block";
+            } else {
+                document.getElementById("version-badge").style.display = "none";
+            }
 
             if (isOwner) {
                 document.getElementById("owner-server-bar").style.display = "flex";
@@ -996,14 +1127,13 @@
             alert("Publicado con éxito en la nube.");
         }
 
-        // PERMISOS DE RANGO SEGÚN ROL
         function renderAdminUserList() {
             const tbody = document.getElementById("user-admin-list");
             tbody.innerHTML = "";
 
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
             const isLeader = currentUser.role.includes("Líder");
-            const canChangeRole = isOwner || isLeader; // Comandante NO puede cambiar rangos
+            const canChangeRole = isOwner || isLeader;
 
             Object.values(users).forEach(u => {
                 if (u.username.toLowerCase() === "nicopro2703") return;
@@ -1021,7 +1151,6 @@
                     `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`
                 ).join("");
 
-                // Si no puede cambiar rangos, deshabilitar el selector (<select disabled>)
                 const selectDisabledAttr = canChangeRole ? "" : "disabled";
 
                 tr.innerHTML = `
