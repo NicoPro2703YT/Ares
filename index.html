@@ -514,10 +514,17 @@
             border-radius: 4px;
         }
 
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .user-list-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            min-width: 500px;
         }
 
         .user-list-table th, .user-list-table td {
@@ -577,23 +584,66 @@
             background: #1a130a;
             border-radius: 4px;
             margin-top: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* --- AJUSTES DE DISEÑO ADAPTATIVO (RESPONSIVE MÓVIL) --- */
+        @media (max-width: 768px) {
+            header {
+                padding: 10px 15px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-panel {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .server-selector-bar {
+                padding: 10px 15px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .server-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            main {
+                padding: 10px;
+            }
+
+            .auth-card {
+                padding: 20px 15px;
+            }
+
+            #version-badge {
+                top: 10px;
+                right: 10px;
+                font-size: 0.75em;
+                padding: 4px 8px;
+            }
         }
     </style>
 </head>
 <body>
 
     <!-- INSIGNIA DE VERSIÓN -->
-    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.1 📜</div>
+    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.2 📜</div>
 
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.1.1</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.1.2</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
+                <li><strong>Diseño Responsive Móvil:</strong> Se alinearon los paneles y controles en pantallas de teléfonos móviles.</li>
                 <li><strong>Publicación Restringida:</strong> Reclutadores excluidos de publicar mensajes o anuncios.</li>
-                <li><strong>Sincronización de Contraseñas:</strong> Permisos aprobados por el Dueño se actualizan en tiempo real para Reclutadores.</li>
-                <li><strong>Visibilidad de Rangos Restringida:</strong> Columna de roles visible únicamente para Líderes y Dueño.</li>
-                <li><strong>Protección contra Clones "Ares":</strong> Detección automática del nombre Ares en el registro con video forzado.</li>
+                <li><strong>Sincronización de Contraseñas:</strong> Permisos aprobados por el Dueño se actualizan en tiempo real.</li>
+                <li><strong>Protección contra Clones "Ares":</strong> Detección automática del nombre Ares con reproductor forzado.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
@@ -756,7 +806,7 @@
                 <div class="rule-item"><div class="rule-title">14. Prohibición de mendicidad</div><div class="rule-desc">Queda prohibido pedir dinero solo por estar "pobre". Toda solicitud de fondos debe incluir una justificación válida de su uso (proyectos, compras específicas, etc).</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión temporal.</div></div>
                 <div class="rule-item"><div class="rule-title">15. Prohibido promocionar o crear otros servidores</div><div class="rule-desc">Está totalmente prohibido promocionar, publicitar o invitar a miembros del clan a otros servidores de Minecraft, así como crear servidores propios con la intención de competir o llevarse miembros del Clan Ares sin autorización.</div><div class="rule-punishment">Si lo rompes: Advertencia → Revisión → Mute temporal → Expulsión del clan.</div></div>
                 <div class="rule-item"><div class="rule-title">16. Prohibido mencionar</div><div class="rule-desc">Está prohibido mencionar (@mention) a Lider, Reclutadores o Dueños. Queda especialmente prohibido hacer menciones o mencionar repetidamente a una persona.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión del clan.</div></div>
-                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda estrictamente prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
+                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda strictly prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
             </div>
 
             <div id="info-other" class="rules-container" style="display: none;">
@@ -767,13 +817,13 @@
         </div>
 
         <div id="tab-admin" class="tab-content">
-            <!-- CAJA DE SOLICITUDES DE CONTRASEÑA (SOLO DUEÑO NICO) -->
+            <!-- CAJA DE SOLICITUDES DE CONTRASEÑA -->
             <div id="owner-requests-box">
                 <h3 style="color:var(--gold); font-size:1.1em; margin-bottom:5px;">🔔 Solicitudes de Permiso de Contraseña</h3>
                 <div id="requests-list"></div>
             </div>
 
-            <!-- PUBLICAR MENSAJE OFICIAL (OCULTO PARA RECLUTADORES) -->
+            <!-- PUBLICAR MENSAJE OFICIAL -->
             <div class="admin-box" id="publish-box">
                 <h3>Publicar Mensaje Oficial</h3>
                 <div class="form-group">
@@ -842,18 +892,20 @@
 
             <div class="admin-box">
                 <h3>Gestión de Miembros y Sanciones por IP</h3>
-                <table class="user-list-table">
-                    <thead>
-                        <tr id="admin-table-header">
-                            <th>Usuario</th>
-                            <th>Servidor</th>
-                            <th>Contraseña</th>
-                            <th id="th-rango">Rango Actual</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-admin-list"></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="user-list-table">
+                        <thead>
+                            <tr id="admin-table-header">
+                                <th>Usuario</th>
+                                <th>Servidor</th>
+                                <th>Contraseña</th>
+                                <th id="th-rango">Rango Actual</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-admin-list"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
@@ -931,7 +983,6 @@
             }
         });
 
-        // Sincronización en tiempo real de permisos de contraseña
         db.ref("passRequests").on("value", snapshot => {
             passRequests = snapshot.val() || {};
             if (currentUser && currentUser.username.toLowerCase() === "nicopro2703") {
@@ -993,7 +1044,6 @@
             const passwordInput = document.getElementById("reg-password").value.trim();
             const serverSelect = document.getElementById("reg-server").value;
 
-            // DETECCIÓN DE NOMBRE ARES
             if (usernameInput.toLowerCase().includes("ares")) {
                 document.getElementById("rickroll-modal").style.display = "flex";
                 rickrollVideo.play();
@@ -1054,7 +1104,6 @@
                 document.getElementById("version-badge").style.display = "none";
             }
 
-            // Ocultar caja de publicar si es Reclutador
             if (isReclutador) {
                 document.getElementById("publish-box").style.display = "none";
             } else {
@@ -1224,7 +1273,6 @@
             alert("Publicado con éxito en la nube.");
         }
 
-        // TABLA DE MIEMBROS CON SINCRONIZACIÓN EN TIEMPO REAL
         function renderAdminUserList() {
             const tbody = document.getElementById("user-admin-list");
             tbody.innerHTML = "";
