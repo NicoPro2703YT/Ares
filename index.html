@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
+        /* --- TEMA OSCURO (Por defecto) --- */
         :root {
             --orange-primary: #ff6600;
             --orange-glow: #ff8800;
@@ -21,6 +22,17 @@
             --red-alert: #e74c3c;
             --gold: #f39c12;
             --purple: #9b59b6;
+            --header-bg: #141414;
+        }
+
+        /* --- TEMA CLARO --- */
+        body.light-mode {
+            --bg-dark: #f0f2f5;
+            --card-bg: #ffffff;
+            --card-border: #dcdcdc;
+            --text-light: #222222;
+            --text-dim: #666666;
+            --header-bg: #ffffff;
         }
 
         * {
@@ -38,13 +50,14 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            transition: background 0.3s, color 0.3s;
         }
 
-        /* --- BOTÓN DE VERSIÓN EXCLUSIVO --- */
+        /* --- BOTÓN DE VERSIÓN Y CONFIGURACIÓN --- */
         #version-badge {
             position: fixed;
             top: 15px;
-            right: 15px;
+            right: 75px;
             background: rgba(255, 102, 0, 0.15);
             border: 1px solid var(--orange-primary);
             color: var(--orange-glow);
@@ -65,8 +78,74 @@
             box-shadow: 0 0 15px var(--orange-glow);
         }
 
+        /* --- CAMPANA DE NOTIFICACIONES --- */
+        .notif-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .btn-bell {
+            background: #222;
+            border: 1px solid var(--card-border);
+            color: var(--text-light);
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            font-size: 1.1em;
+            transition: 0.3s;
+        }
+
+        .btn-bell:hover {
+            border-color: var(--orange-primary);
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--red-alert);
+            color: white;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 50%;
+            font-weight: bold;
+            display: none;
+        }
+
+        .notif-dropdown {
+            position: absolute;
+            right: 0;
+            top: 45px;
+            width: 300px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 2000;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .notif-dropdown.show {
+            display: block;
+        }
+
+        .notif-item {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.85em;
+            color: var(--text-light);
+        }
+
+        .notif-item:last-child {
+            border-bottom: none;
+        }
+
         /* --- MODALES --- */
-        #version-modal, #rickroll-modal {
+        #version-modal, #rickroll-modal, #profile-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -81,26 +160,23 @@
             padding: 20px;
         }
 
-        .version-card, .rickroll-card {
+        .version-card, .rickroll-card, .profile-card {
             background: var(--card-bg);
             border: 2px solid var(--gold);
             border-radius: 12px;
             padding: 25px;
             width: 100%;
-            max-width: 550px;
+            max-width: 450px;
             box-shadow: 0 0 30px rgba(243, 156, 18, 0.3);
             user-select: text;
             text-align: center;
         }
 
-        .version-card h3 {
+        .version-card h3, .profile-card h3 {
             color: var(--gold);
             margin-bottom: 15px;
             border-bottom: 1px solid var(--card-border);
             padding-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .version-list {
@@ -217,6 +293,11 @@
             user-select: text;
         }
 
+        body.light-mode .auth-form input, body.light-mode .auth-form select {
+            background: #f9f9f9;
+            color: #222;
+        }
+
         .auth-form input:focus, .auth-form select:focus {
             border-color: var(--orange-primary);
         }
@@ -246,7 +327,7 @@
         }
 
         header {
-            background: #141414;
+            background: var(--header-bg);
             border-bottom: 2px solid var(--orange-primary);
             padding: 15px 30px;
             display: flex;
@@ -254,6 +335,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
+            transition: background 0.3s;
         }
 
         .brand-container {
@@ -280,10 +362,19 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            background: #1f1f1f;
+            background: var(--card-bg);
             padding: 8px 15px;
             border-radius: 8px;
             border: 1px solid var(--card-border);
+        }
+
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--orange-primary);
+            cursor: pointer;
         }
 
         .user-info {
@@ -292,7 +383,7 @@
 
         .user-name {
             font-weight: bold;
-            color: #fff;
+            color: var(--text-light);
         }
 
         .user-role {
@@ -316,7 +407,7 @@
         }
 
         .server-selector-bar {
-            background: #111;
+            background: var(--card-bg);
             padding: 10px 30px;
             display: flex;
             align-items: center;
@@ -333,7 +424,7 @@
         }
 
         .server-banner {
-            background: linear-gradient(90deg, #1f1f1f 0%, #2a180b 100%);
+            background: linear-gradient(90deg, var(--card-bg) 0%, #2a180b 100%);
             border-left: 5px solid var(--orange-primary);
             padding: 20px;
             border-radius: 8px;
@@ -409,12 +500,16 @@
             border-left: 4px solid var(--red-alert);
         }
 
+        .content-card.event-card {
+            border-left: 4px solid var(--purple);
+        }
+
         .card-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
             padding-bottom: 8px;
-            border-bottom: 1px solid #252525;
+            border-bottom: 1px solid var(--card-border);
         }
 
         .card-title {
@@ -457,14 +552,14 @@
 
         .rule-item {
             margin-bottom: 18px;
-            background: #141414;
+            background: var(--header-bg);
             padding: 12px 15px;
             border-radius: 6px;
             border-left: 3px solid var(--orange-primary);
         }
 
         .rule-title {
-            color: #fff;
+            color: var(--text-light);
             font-weight: bold;
             margin-bottom: 5px;
         }
@@ -481,7 +576,7 @@
         }
 
         .admin-box {
-            background: #1a1510;
+            background: var(--card-bg);
             border: 1px solid var(--gold);
             border-radius: 8px;
             padding: 20px;
@@ -508,9 +603,9 @@
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 8px;
-            background: #111;
+            background: var(--bg-dark);
             border: 1px solid var(--card-border);
-            color: white;
+            color: var(--text-light);
             border-radius: 4px;
         }
 
@@ -534,7 +629,7 @@
         }
 
         .user-list-table th {
-            background: #222;
+            background: var(--header-bg);
             color: var(--orange-primary);
         }
 
@@ -568,7 +663,7 @@
 
         /* BANNER DE NOTIFICACIONES PARA EL DUEÑO */
         #owner-requests-box {
-            background: #2b1d0c;
+            background: var(--card-bg);
             border: 1px solid var(--gold);
             padding: 15px;
             border-radius: 8px;
@@ -581,7 +676,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 8px;
-            background: #1a130a;
+            background: var(--bg-dark);
             border-radius: 4px;
             margin-top: 8px;
             flex-wrap: wrap;
@@ -633,22 +728,42 @@
 <body>
 
     <!-- INSIGNIA DE VERSIÓN -->
-    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.7 📜</div>
+    <div id="version-badge" onclick="toggleVersionModal(true)">v1.2.0 📜</div>
 
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.1.7</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.2.0</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Corrección de Script:</strong> Solucionado el error de sintaxis que bloqueaba los botones de inicio de sesión y registro.</li>
-                <li><strong>Nuevo Logotipo (AresHalloween.png):</strong> Imagen oficial integrada en el portal.</li>
-                <li><strong>Video Anticlones Blindado:</strong> Reproducción automática forzada sin opción a pausar o silenciar.</li>
+                <li><strong>Perfiles Personalizados:</strong> Personaliza tu avatar mediante enlace de imagen.</li>
+                <li><strong>Modo Oscuro / Modo Claro:</strong> Cambia el tema visual del portal a tu gusto con persistencia.</li>
+                <li><strong>Centro de Notificaciones:</strong> Campana interactiva con contador y avisos en tiempo real para anuncios, rangos y eventos.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
     </div>
 
-    <!-- MODAL RICKROLL (BLINDADO: SIN CONTROLES NATIVOS, AUDIO FORZADO) -->
+    <!-- MODAL CONFIGURACIÓN DE PERFIL -->
+    <div id="profile-modal">
+        <div class="profile-card">
+            <h3>Editar Mi Perfil</h3>
+            <div class="form-group" style="text-align: left;">
+                <label>URL del Avatar (Imagen)</label>
+                <input type="text" id="profile-avatar-input" placeholder="https://ejemplo.com/imagen.png">
+            </div>
+            <div class="form-group" style="text-align: left;">
+                <label>Tema Visual</label>
+                <select id="profile-theme-select">
+                    <option value="dark">Modo Oscuro</option>
+                    <option value="light">Modo Claro</option>
+                </select>
+            </div>
+            <button class="btn-submit" onclick="saveProfileSettings()">Guardar Cambios</button>
+            <button class="btn-close-modal" onclick="toggleProfileModal(false)">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL RICKROLL -->
     <div id="rickroll-modal">
         <div class="rickroll-card">
             <h3 style="color:var(--orange-primary); margin-bottom:15px;">⚠️ ACCESO NO PERMITIDO</h3>
@@ -720,18 +835,35 @@
             </div>
         </div>
 
-        <div class="user-panel">
-            <div class="user-info">
-                <div class="user-name" id="display-username">Cargando...</div>
-                <div class="user-role" id="display-role">Miembro</div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <!-- CAMPANA DE NOTIFICACIONES -->
+            <div class="notif-wrapper">
+                <button class="btn-bell" onclick="toggleNotifDropdown()">🔔 <span id="notif-badge" class="notif-badge">0</span></button>
+                <div id="notif-dropdown" class="notif-dropdown">
+                    <div style="font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid var(--card-border); padding-bottom: 4px; display: flex; justify-content: space-between;">
+                        <span>Notificaciones</span>
+                        <span style="font-size: 0.8em; cursor: pointer; color: var(--orange-primary);" onclick="clearNotifications()">Limpiar</span>
+                    </div>
+                    <div id="notif-list">
+                        <div style="font-size: 0.85em; color: var(--text-dim); text-align: center; padding: 10px;">No hay notificaciones</div>
+                    </div>
+                </div>
             </div>
-            <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+
+            <div class="user-panel">
+                <img id="display-avatar" src="AresHalloween.png" class="user-avatar-small" alt="Avatar" onclick="toggleProfileModal(true)" title="Editar Perfil">
+                <div class="user-info">
+                    <div class="user-name" id="display-username">Cargando...</div>
+                    <div class="user-role" id="display-role">Miembro</div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Salir</button>
+            </div>
         </div>
     </header>
 
     <div id="owner-server-bar" class="server-selector-bar" style="display: none;">
         <span style="font-size: 0.85em; color: var(--gold); font-weight: bold;">[Modo Dueño] Cambiar Servidor:</span>
-        <select id="owner-server-select" onchange="changeServerOwner(this.value)" style="padding: 4px 8px; background: #222; color: #fff; border: 1px solid var(--orange-primary); border-radius: 4px;">
+        <select id="owner-server-select" onchange="changeServerOwner(this.value)" style="padding: 4px 8px; background: var(--bg-dark); color: var(--text-light); border: 1px solid var(--orange-primary); border-radius: 4px;">
             <option value="NauticMC">NauticMC</option>
             <option value="OlimpoCraft">OlimpoCraft</option>
             <option value="MineVoid">MineVoid</option>
@@ -804,25 +936,26 @@
                 <div id="requests-list"></div>
             </div>
 
-            <!-- PUBLICAR MENSAJE OFICIAL -->
+            <!-- PUBLICAR MENSAJE OFICIAL O EVENTO -->
             <div class="admin-box" id="publish-box">
-                <h3>Publicar Mensaje Oficial</h3>
+                <h3>Publicar Mensaje / Convocatoria Oficial</h3>
                 <div class="form-group">
                     <label>Tipo de Publicación</label>
                     <select id="post-type" onchange="toggleFormFields()">
                         <option value="anuncio">Anuncio</option>
                         <option value="advertencia">Advertencia</option>
+                        <option value="evento">Convocatoria de Evento</option>
                     </select>
                 </div>
 
                 <div id="group-anuncio">
                     <div class="form-group">
-                        <label>Título del Anuncio</label>
-                        <input type="text" id="post-title" placeholder="Título del anuncio">
+                        <label>Título del Anuncio / Evento</label>
+                        <input type="text" id="post-title" placeholder="Título oficial">
                     </div>
                     <div class="form-group">
-                        <label>Contenido</label>
-                        <textarea id="post-body" rows="3" placeholder="Escribe el anuncio..."></textarea>
+                        <label>Contenido / Detalles</label>
+                        <textarea id="post-body" rows="3" placeholder="Escribe el mensaje..."></textarea>
                     </div>
                 </div>
 
@@ -868,7 +1001,7 @@
                     </div>
                 </div>
 
-                <button class="btn-submit" onclick="publishPost()">Publicar</button>
+                <button class="btn-submit" onclick="publishPost()">Publicar en la Nube</button>
             </div>
 
             <div class="admin-box">
@@ -921,6 +1054,7 @@
         let posts = {};
         let bannedIPs = {};
         let passRequests = {};
+        let notifications = [];
         let currentUser = JSON.parse(localStorage.getItem("ares_current_session")) || null;
         let currentActiveServer = "NauticMC";
 
@@ -930,21 +1064,34 @@
             localStorage.setItem("ares_device_ip", currentDeviceIP);
         }
 
+        // Aplicar tema guardado previamente
+        const savedTheme = localStorage.getItem("ares_theme") || "dark";
+        setTheme(savedTheme);
+
         // Cuenta del dueño
         db.ref("users/NicoPro2703").set({
             username: "NicoPro2703",
             password: OWNER_PASS,
             server: "GLOBAL",
             role: "Dueño",
-            ipHash: "DEVICE_OWNER_ARES"
+            ipHash: "DEVICE_OWNER_ARES",
+            avatar: "AresHalloween.png",
+            theme: "dark"
         });
 
         // Carga de datos
         db.ref("users").on("value", snapshot => {
             users = snapshot.val() || {};
             if (currentUser && users[currentUser.username]) {
+                const oldRole = currentUser.role;
                 currentUser = users[currentUser.username];
                 localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
+                
+                // Detectar cambio de rango para notificar
+                if (oldRole && oldRole !== currentUser.role) {
+                    addNotification(`¡Tu rango ha cambiado a: ${currentUser.role}!`);
+                }
+
                 document.getElementById("auth-overlay").style.display = "none";
                 initPortal();
             } else if (!currentUser) {
@@ -976,7 +1123,80 @@
             document.getElementById("version-modal").style.display = show ? "flex" : "none";
         }
 
-        // LÓGICA DE RICKROLL BLINDADA (SIN PAUSA NI SILENCIO)
+        function toggleProfileModal(show) {
+            if (show && currentUser) {
+                document.getElementById("profile-avatar-input").value = currentUser.avatar || "AresHalloween.png";
+                document.getElementById("profile-theme-select").value = currentUser.theme || "dark";
+            }
+            document.getElementById("profile-modal").style.display = show ? "flex" : "none";
+        }
+
+        function saveProfileSettings() {
+            const newAvatar = document.getElementById("profile-avatar-input").value.trim() || "AresHalloween.png";
+            const newTheme = document.getElementById("profile-theme-select").value;
+
+            db.ref("users/" + currentUser.username).update({
+                avatar: newAvatar,
+                theme: newTheme
+            });
+
+            currentUser.avatar = newAvatar;
+            currentUser.theme = newTheme;
+            localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
+
+            setTheme(newTheme);
+            toggleProfileModal(false);
+            initPortal();
+            alert("Perfil actualizado con éxito.");
+        }
+
+        function setTheme(themeName) {
+            if (themeName === "light") {
+                document.body.classList.add("light-mode");
+                localStorage.setItem("ares_theme", "light");
+            } else {
+                document.body.classList.remove("light-mode");
+                localStorage.setItem("ares_theme", "dark");
+            }
+        }
+
+        // GESTIÓN DE NOTIFICACIONES
+        function addNotification(text) {
+            notifications.unshift({ text: text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            updateNotifUI();
+        }
+
+        function updateNotifUI() {
+            const badge = document.getElementById("notif-badge");
+            const list = document.getElementById("notif-list");
+
+            if (notifications.length > 0) {
+                badge.innerText = notifications.length;
+                badge.style.display = "inline-block";
+                
+                list.innerHTML = notifications.map(n => `
+                    <div class="notif-item">
+                        <div>⚡ ${n.text}</div>
+                        <div style="font-size:0.7em; color:var(--text-dim); text-align:right; margin-top:2px;">${n.time}</div>
+                    </div>
+                `).join("");
+            } else {
+                badge.style.display = "none";
+                list.innerHTML = "<div style='font-size: 0.85em; color: var(--text-dim); text-align: center; padding: 10px;'>No hay notificaciones</div>";
+            }
+        }
+
+        function toggleNotifDropdown() {
+            const dropdown = document.getElementById("notif-dropdown");
+            dropdown.classList.toggle("show");
+        }
+
+        function clearNotifications() {
+            notifications = [];
+            updateNotifUI();
+        }
+
+        // LÓGICA DE RICKROLL BLINDADA
         const rickrollVideo = document.getElementById("rickroll-video");
 
         rickrollVideo.addEventListener('pause', function() {
@@ -1025,6 +1245,7 @@
             if (foundUser) {
                 currentUser = foundUser;
                 localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
+                setTheme(currentUser.theme || "dark");
                 document.getElementById("auth-overlay").style.display = "none";
                 initPortal();
             } else {
@@ -1070,12 +1291,15 @@
                 password: passwordInput,
                 server: isOwner ? "GLOBAL" : serverSelect,
                 role: isOwner ? "Dueño" : "Miembro",
-                ipHash: currentDeviceIP
+                ipHash: currentDeviceIP,
+                avatar: "AresHalloween.png",
+                theme: "dark"
             };
 
             db.ref("users/" + usernameInput).set(newUser);
             currentUser = newUser;
             localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
+            setTheme("dark");
 
             document.getElementById("auth-overlay").style.display = "none";
             initPortal();
@@ -1090,6 +1314,8 @@
         function initPortal() {
             document.getElementById("display-username").innerText = currentUser.username;
             document.getElementById("display-role").innerText = currentUser.role;
+            document.getElementById("display-avatar").src = currentUser.avatar || "AresHalloween.png";
+            setTheme(currentUser.theme || "dark");
 
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
             const isLeader = currentUser.role.includes("Líder");
@@ -1174,10 +1400,16 @@
 
             filteredPosts.forEach(p => {
                 const card = document.createElement("div");
-                card.className = "content-card" + (p.type === "advertencia" ? " warning-card" : "");
+                if (p.type === "advertencia") {
+                    card.className = "content-card warning-card";
+                } else if (p.type === "evento") {
+                    card.className = "content-card event-card";
+                } else {
+                    card.className = "content-card";
+                }
 
                 let bodyContent = "";
-                if (p.type === "anuncio") {
+                if (p.type === "anuncio" || p.type === "evento") {
                     bodyContent = `<p>${p.content}</p>`;
                 } else {
                     bodyContent = `
@@ -1192,7 +1424,7 @@
 
                 card.innerHTML = `
                     <div class="card-header">
-                        <span class="card-title">${p.title || 'ADVERTENCIA OFICIAL'}</span>
+                        <span class="card-title">${p.title || 'AVISO OFICIAL'}</span>
                         <span class="card-date">${p.date}</span>
                     </div>
                     <div class="card-body">
@@ -1202,15 +1434,15 @@
                     <div style="clear:both;"></div>
                 `;
 
-                if (p.type === "anuncio") {
-                    anunciosContainer.appendChild(card);
-                } else {
+                if (p.type === "advertencia") {
                     advertenciasContainer.appendChild(card);
+                } else {
+                    anunciosContainer.appendChild(card);
                 }
             });
 
             if (anunciosContainer.children.length === 0) {
-                anunciosContainer.innerHTML = "<p style='color:var(--text-dim);'>No hay anuncios para este servidor.</p>";
+                anunciosContainer.innerHTML = "<p style='color:var(--text-dim);'>No hay anuncios ni eventos para este servidor.</p>";
             }
             if (advertenciasContainer.children.length === 0) {
                 advertenciasContainer.innerHTML = "<p style='color:var(--text-dim);'>No hay advertencias registradas para este servidor.</p>";
@@ -1225,7 +1457,7 @@
 
         function toggleFormFields() {
             const type = document.getElementById("post-type").value;
-            document.getElementById("group-anuncio").style.display = type === "anuncio" ? "block" : "none";
+            document.getElementById("group-anuncio").style.display = type !== "advertencia" ? "block" : "none";
             document.getElementById("group-advertencia").style.display = type === "advertencia" ? "block" : "none";
         }
 
@@ -1239,13 +1471,16 @@
                 date: new Date().toISOString().split('T')[0]
             };
 
-            if (type === "anuncio") {
+            if (type === "anuncio" || type === "evento") {
                 const title = document.getElementById("post-title").value.trim();
                 const body = document.getElementById("post-body").value.trim();
                 if (!title || !body) { alert("Completa el título y contenido."); return; }
 
-                newPost.title = title;
+                newPost.title = (type === "evento" ? "📅 EVENTO: " : "📢 ") + title;
                 newPost.content = body;
+
+                // Lanzar notificación general para todos
+                addNotification(type === "evento" ? `¡Nuevo Evento convocado: ${title}!` : `¡Nuevo Anuncio publicado!`);
             } else {
                 const userVal = document.getElementById("warn-user").value.trim();
                 const nickVal = document.getElementById("warn-nick").value.trim();
@@ -1322,7 +1557,7 @@
 
                     roleColHTML = `
                         <td>
-                            <select onchange="updateUserRole('${u.username}', this.value)" style="padding:4px; background:#111; color:white; border:1px solid #444; border-radius:4px;">
+                            <select onchange="updateUserRole('${u.username}', this.value)" style="padding:4px; background:var(--bg-dark); color:var(--text-light); border:1px solid var(--card-border); border-radius:4px;">
                                 ${roleOptionsHTML}
                             </select>
                         </td>
