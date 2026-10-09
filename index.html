@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clan Ares - Sitio Oficial</title>
+    
+    <!-- SDK de Firebase (Compatibilidad Web) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --orange-primary: #ff6600;
@@ -33,7 +38,7 @@
             flex-direction: column;
         }
 
-        /* --- PANTALLA DE BLOQUEO / LOGIN --- */
+        /* PANTALLA LOGIN / REGISTRO */
         #auth-overlay {
             position: fixed;
             top: 0;
@@ -58,15 +63,6 @@
             max-width: 420px;
             box-shadow: 0 0 25px rgba(255, 102, 0, 0.3);
             text-align: center;
-        }
-
-        .auth-header img {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            border: 3px solid var(--orange-primary);
-            margin-bottom: 15px;
-            object-fit: cover;
         }
 
         .auth-tabs {
@@ -141,7 +137,6 @@
             display: none;
         }
 
-        /* --- CABECERA Y NAVEGACIÓN PRINCIPAL --- */
         header {
             background: #141414;
             border-bottom: 2px solid var(--orange-primary);
@@ -212,7 +207,6 @@
             color: white;
         }
 
-        /* --- SERVIDOR SELECTOR (SOLO DUEÑO) --- */
         .server-selector-bar {
             background: #111;
             padding: 10px 30px;
@@ -222,7 +216,6 @@
             border-bottom: 1px solid var(--card-border);
         }
 
-        /* --- CONTENIDO PRINCIPAL --- */
         main {
             flex: 1;
             max-width: 1200px;
@@ -261,7 +254,6 @@
             border: 1px solid #e74c3c;
         }
 
-        /* --- NAVEGACIÓN INTERNA --- */
         .nav-tabs {
             display: flex;
             gap: 10px;
@@ -295,7 +287,6 @@
             display: block;
         }
 
-        /* --- CONTENIDO DE MÓDULOS --- */
         .content-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -341,11 +332,6 @@
             font-weight: bold;
         }
 
-        .btn-delete-post:hover {
-            opacity: 0.85;
-        }
-
-        /* --- REGLAS DE NAUTICMC --- */
         .rules-container {
             background: var(--card-bg);
             padding: 25px;
@@ -384,7 +370,6 @@
             margin-top: 4px;
         }
 
-        /* --- PANEL ADMINISTRATIVO / MODERACIÓN --- */
         .admin-box {
             background: #1a1510;
             border: 1px solid var(--gold);
@@ -460,11 +445,10 @@
 </head>
 <body>
 
-    <!-- OVERLAY DE BLOQUEO / AUTENTICACIÓN -->
+    <!-- OVERLAY AUTENTICACIÓN -->
     <div id="auth-overlay">
         <div class="auth-card">
-            <div class="auth-header">
-                <!-- Guerrero Calabaza Incrustado -->
+            <div style="margin-bottom:15px;">
                 <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="50" cy="50" r="48" fill="#000" stroke="#ff6600" stroke-width="3"/>
                     <path d="M50 12 C53 6, 58 4, 60 2 C55 4, 52 7, 50 12 Z" fill="#2e7d32"/>
@@ -484,7 +468,6 @@
                 <button class="auth-tab-btn" id="tab-register-btn" onclick="switchAuthTab('register')">Registrarse</button>
             </div>
 
-            <!-- FORMULARIO LOGIN -->
             <form id="form-login" class="auth-form" onsubmit="handleLogin(event)">
                 <div>
                     <label>Usuario</label>
@@ -498,7 +481,6 @@
                 <button type="submit" class="btn-submit">Entrar al Portal</button>
             </form>
 
-            <!-- FORMULARIO REGISTRO -->
             <form id="form-register" class="auth-form" onsubmit="handleRegister(event)" style="display: none;">
                 <div>
                     <label>Nombre de Usuario (Pon tu nombre de Usuario de Minecraft)</label>
@@ -522,7 +504,6 @@
         </div>
     </div>
 
-    <!-- CABECERA PRINCIPAL -->
     <header>
         <div class="brand-container">
             <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -550,7 +531,6 @@
         </div>
     </header>
 
-    <!-- BARRA EXCLUSIVA PARA EL DUEÑO -->
     <div id="owner-server-bar" class="server-selector-bar" style="display: none;">
         <span style="font-size: 0.85em; color: var(--gold); font-weight: bold;">[Modo Dueño] Cambiar Servidor:</span>
         <select id="owner-server-select" onchange="changeServerOwner(this.value)" style="padding: 4px 8px; background: #222; color: #fff; border: 1px solid var(--orange-primary); border-radius: 4px;">
@@ -560,7 +540,6 @@
         </select>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <main>
         <div class="server-banner">
             <div>
@@ -570,7 +549,6 @@
             <div id="server-status-badge" class="status-badge status-online">ONLINE</div>
         </div>
 
-        <!-- SOLAPAS DE NAVEGACIÓN -->
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchMainTab('anuncios')">Anuncios</button>
             <button class="tab-btn" onclick="switchMainTab('advertencias')">Advertencias</button>
@@ -578,17 +556,14 @@
             <button class="tab-btn" id="tab-admin-btn" style="display:none; color: var(--gold);" onclick="switchMainTab('admin')">Panel de Control</button>
         </div>
 
-        <!-- SECCIÓN: ANUNCIOS -->
         <div id="tab-anuncios" class="tab-content active">
             <div id="anuncios-list"></div>
         </div>
 
-        <!-- SECCIÓN: ADVERTENCIAS -->
         <div id="tab-advertencias" class="tab-content">
             <div id="advertencias-list"></div>
         </div>
 
-        <!-- SECCIÓN: INFORMACIÓN GENERAL -->
         <div id="tab-informacion" class="tab-content">
             <div id="info-nautic" class="rules-container">
                 <div class="rules-header">
@@ -614,7 +589,7 @@
                 <div class="rule-item"><div class="rule-title">14. Prohibición de mendicidad</div><div class="rule-desc">Queda prohibido pedir dinero solo por estar "pobre". Toda solicitud de fondos debe incluir una justificación válida de su uso (proyectos, compras específicas, etc).</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión temporal.</div></div>
                 <div class="rule-item"><div class="rule-title">15. Prohibido promocionar o crear otros servidores</div><div class="rule-desc">Está totalmente prohibido promocionar, publicitar o invitar a miembros del clan a otros servidores de Minecraft, así como crear servidores propios con la intención de competir o llevarse miembros del Clan Ares sin autorización.</div><div class="rule-punishment">Si lo rompes: Advertencia → Revisión → Mute temporal → Expulsión del clan.</div></div>
                 <div class="rule-item"><div class="rule-title">16. Prohibido mencionar</div><div class="rule-desc">Está prohibido mencionar (@mention) a Lider, Reclutadores o Dueños. Queda especialmente prohibido hacer menciones o mencionar repetidamente a una persona.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión del clan.</div></div>
-                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda strictly prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
+                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda estrictamente prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
             </div>
 
             <div id="info-other" class="rules-container" style="display: none;">
@@ -624,7 +599,6 @@
             </div>
         </div>
 
-        <!-- SECCIÓN: PANEL DE ADMINISTRACIÓN Y MODERACIÓN -->
         <div id="tab-admin" class="tab-content">
             <div class="admin-box">
                 <h3>Publicar Mensaje Oficial</h3>
@@ -710,28 +684,26 @@
     </main>
 
     <script>
+        // CONFIGURACIÓN DE FIREBASE EXTRAÍDA DE TU CAPTURA
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1aM2DzLEYVaFyMhI7BYEAXk4E57sjM",
+            authDomain: "clan-ares.firebaseapp.com",
+            databaseURL: "https://clan-ares-default-rtdb.firebaseio.com",
+            projectId: "clan-ares",
+            storageBucket: "clan-ares.appspot.com",
+            messagingSenderId: "72885799547",
+            appId: "1:72885799547:web:8f632dc4bacf41caa5b9de"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const OWNER_PASS = "NicoDueño2703XD";
-
-        const DEFAULT_USERS = [
-            { username: "NicoPro2703", password: OWNER_PASS, server: "GLOBAL", role: "Dueño", ipHash: "DEVICE_OWNER_ARES" },
-            { username: "Máximo", password: "123", server: "NauticMC", role: "Líder - NauticMC", ipHash: "DEVICE_MAXIMO" }
-        ];
-
-        // Se inician las listas vacías para no tener anuncios ni advertencias por defecto
-        let posts = JSON.parse(localStorage.getItem("ares_posts")) || [];
-        let users = JSON.parse(localStorage.getItem("ares_users")) || DEFAULT_USERS;
-        let bannedIPs = JSON.parse(localStorage.getItem("ares_banned_ips")) || [];
+        let users = {};
+        let posts = {};
+        let bannedIPs = {};
         let currentUser = JSON.parse(localStorage.getItem("ares_current_session")) || null;
         let currentActiveServer = "NauticMC";
-
-        // Asegurar que las credenciales de NicoPro2703 estén siempre bien configuradas
-        let ownerIdx = users.findIndex(u => u.username.toLowerCase() === "nicopro2703");
-        if (ownerIdx !== -1) {
-            users[ownerIdx].password = OWNER_PASS;
-        } else {
-            users.push({ username: "NicoPro2703", password: OWNER_PASS, server: "GLOBAL", role: "Dueño", ipHash: "DEVICE_OWNER_ARES" });
-        }
-        localStorage.setItem("ares_users", JSON.stringify(users));
 
         let currentDeviceIP = localStorage.getItem("ares_device_ip");
         if (!currentDeviceIP) {
@@ -739,27 +711,40 @@
             localStorage.setItem("ares_device_ip", currentDeviceIP);
         }
 
+        // Registrar cuenta del dueño por defecto en la nube
+        db.ref("users/NicoPro2703").set({
+            username: "NicoPro2703",
+            password: OWNER_PASS,
+            server: "GLOBAL",
+            role: "Dueño",
+            ipHash: "DEVICE_OWNER_ARES"
+        });
+
+        // Sincronización en tiempo real
+        db.ref("users").on("value", snapshot => {
+            users = snapshot.val() || {};
+            if (currentUser) renderAdminUserList();
+        });
+
+        db.ref("posts").on("value", snapshot => {
+            posts = snapshot.val() || {};
+            if (currentUser) renderPosts();
+        });
+
+        db.ref("bannedIPs").on("value", snapshot => {
+            bannedIPs = snapshot.val() || {};
+            if (bannedIPs[currentDeviceIP]) {
+                document.body.innerHTML = "<div style='color:white; text-align:center; padding:50px;'><h1>ACCESO BLOQUEADO</h1><p style='color:red;'>Tu IP / Dispositivo ha sido baneado del portal del Clan Ares.</p></div>";
+            }
+        });
+
         window.onload = function() {
-            checkBannedStatus();
             if (currentUser) {
                 initPortal();
             } else {
                 document.getElementById("auth-overlay").style.display = "flex";
             }
         };
-
-        function checkBannedStatus() {
-            if (bannedIPs.includes(currentDeviceIP)) {
-                document.body.innerHTML = "<div style='color:white; text-align:center; padding:50px;'><h1>ACCESO BLOQUEADO</h1><p style='color:red;'>Tu IP / Dispositivo ha sido baneado del portal del Clan Ares.</p></div>";
-            }
-        }
-
-        function saveData() {
-            localStorage.setItem("ares_users", JSON.stringify(users));
-            localStorage.setItem("ares_posts", JSON.stringify(posts));
-            localStorage.setItem("ares_banned_ips", JSON.stringify(bannedIPs));
-            localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
-        }
 
         function switchAuthTab(tab) {
             document.getElementById("tab-login-btn").classList.toggle("active", tab === 'login');
@@ -775,11 +760,11 @@
             const usernameInput = document.getElementById("login-username").value.trim();
             const passwordInput = document.getElementById("login-password").value.trim();
 
-            const foundUser = users.find(u => u.username.toLowerCase() === usernameInput.toLowerCase() && u.password === passwordInput);
+            const foundUser = Object.values(users).find(u => u.username.toLowerCase() === usernameInput.toLowerCase() && u.password === passwordInput);
 
             if (foundUser) {
                 currentUser = foundUser;
-                saveData();
+                localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
                 document.getElementById("auth-overlay").style.display = "none";
                 initPortal();
             } else {
@@ -794,14 +779,14 @@
             const passwordInput = document.getElementById("reg-password").value.trim();
             const serverSelect = document.getElementById("reg-server").value;
 
-            const existingIPUser = users.find(u => u.ipHash === currentDeviceIP);
+            const existingIPUser = Object.values(users).find(u => u.ipHash === currentDeviceIP);
             if (existingIPUser && usernameInput.toLowerCase() !== "nicopro2703") {
                 document.getElementById("reg-error").innerText = "Ya existe una cuenta registrada desde esta IP (" + existingIPUser.username + ").";
                 document.getElementById("reg-error").style.display = "block";
                 return;
             }
 
-            if (users.find(u => u.username.toLowerCase() === usernameInput.toLowerCase())) {
+            if (Object.values(users).find(u => u.username.toLowerCase() === usernameInput.toLowerCase())) {
                 document.getElementById("reg-error").innerText = "Ese usuario ya está registrado.";
                 document.getElementById("reg-error").style.display = "block";
                 return;
@@ -816,9 +801,9 @@
                 ipHash: currentDeviceIP
             };
 
-            users.push(newUser);
+            db.ref("users/" + usernameInput).set(newUser);
             currentUser = newUser;
-            saveData();
+            localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
 
             document.getElementById("auth-overlay").style.display = "none";
             initPortal();
@@ -885,7 +870,6 @@
             }
         }
 
-        // --- SISTEMA DE RENDERIZADO Y ELIMINACIÓN CORREGIDO ---
         function renderPosts() {
             const anunciosContainer = document.getElementById("anuncios-list");
             const advertenciasContainer = document.getElementById("advertencias-list");
@@ -896,7 +880,9 @@
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
             const isAdmin = isOwner || currentUser.role.includes("Líder") || currentUser.role.includes("Comandante");
 
-            const filteredPosts = posts.filter(p => p.server === currentActiveServer);
+            const filteredPosts = Object.entries(posts)
+                .map(([key, val]) => ({ id: key, ...val }))
+                .filter(p => p.server === currentActiveServer);
 
             filteredPosts.forEach(p => {
                 const card = document.createElement("div");
@@ -914,7 +900,7 @@
                     `;
                 }
 
-                let deleteBtnHTML = isAdmin ? `<button class="btn-delete-post" onclick="deletePost(${p.id})">Eliminar</button>` : "";
+                let deleteBtnHTML = isAdmin ? `<button class="btn-delete-post" onclick="deletePost('${p.id}')">Eliminar</button>` : "";
 
                 card.innerHTML = `
                     <div class="card-header">
@@ -943,12 +929,9 @@
             }
         }
 
-        // Función de eliminación arreglada
         function deletePost(postId) {
             if (confirm("¿Estás seguro de que deseas eliminar esta publicación?")) {
-                posts = posts.filter(p => String(p.id) !== String(postId));
-                saveData();
-                renderPosts();
+                db.ref("posts/" + postId).remove();
             }
         }
 
@@ -960,8 +943,9 @@
 
         function publishPost() {
             const type = document.getElementById("post-type").value;
+            const newPostRef = db.ref("posts").push();
+
             let newPost = {
-                id: Date.now(),
                 type: type,
                 server: currentActiveServer,
                 date: new Date().toISOString().split('T')[0]
@@ -989,22 +973,20 @@
                 newPost.title = "Advertencia a " + nickVal;
             }
 
-            posts.unshift(newPost);
-            saveData();
-            renderPosts();
+            newPostRef.set(newPost);
 
             document.getElementById("post-title").value = "";
             document.getElementById("post-body").value = "";
             document.getElementById("warn-user").value = "";
             document.getElementById("warn-nick").value = "";
-            alert("Publicación realizada correctamente en " + currentActiveServer);
+            alert("Publicado con éxito en la nube.");
         }
 
         function renderAdminUserList() {
             const tbody = document.getElementById("user-admin-list");
             tbody.innerHTML = "";
 
-            users.forEach(u => {
+            Object.values(users).forEach(u => {
                 if (u.username.toLowerCase() === "nicopro2703") return;
 
                 const tr = document.createElement("tr");
@@ -1038,23 +1020,15 @@
         }
 
         function updateUserRole(targetUsername, newRole) {
-            const target = users.find(u => u.username === targetUsername);
-            if (target) {
-                target.role = newRole;
-                saveData();
-                alert(`Rango de ${targetUsername} actualizado a: ${newRole}`);
-            }
+            db.ref("users/" + targetUsername + "/role").set(newRole);
+            alert(`Rango de ${targetUsername} actualizado a: ${newRole}`);
         }
 
         function banUserIP(targetUsername, targetIP) {
             if (confirm(`¿Deseas banear por IP a ${targetUsername}?`)) {
-                if (!bannedIPs.includes(targetIP)) {
-                    bannedIPs.push(targetIP);
-                }
-                users = users.filter(u => u.username !== targetUsername);
-                saveData();
-                renderAdminUserList();
-                alert(`El usuario ${targetUsername} ha sido baneado.`);
+                db.ref("bannedIPs/" + targetIP).set(true);
+                db.ref("users/" + targetUsername).remove();
+                alert(`El usuario ${targetUsername} ha sido baneado de forma global.`);
             }
         }
 
