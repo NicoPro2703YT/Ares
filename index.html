@@ -633,16 +633,16 @@
 <body>
 
     <!-- INSIGNIA DE VERSIÓN -->
-    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.6 📜</div>
+    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.7 📜</div>
 
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.1.6</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.1.7</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Nuevo Logotipo (AresHalloween.png):</strong> Se actualizó la imagen del logotipo oficial en el portal de acceso y la cabecera.</li>
+                <li><strong>Corrección de Script:</strong> Solucionado el error de sintaxis que bloqueaba los botones de inicio de sesión y registro.</li>
+                <li><strong>Nuevo Logotipo (AresHalloween.png):</strong> Imagen oficial integrada en el portal.</li>
                 <li><strong>Video Anticlones Blindado:</strong> Reproducción automática forzada sin opción a pausar o silenciar.</li>
-                <li><strong>Expiración de Contraseñas (5 Minutos):</strong> Permisos de visualización con caducidad automática.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
@@ -1401,12 +1401,6 @@
 
         function switchMainTab(tabName) {
             const tabs = ['anuncios', 'advertencias', 'informacion', 'admin'];
-            tabs.forEach(t => {
-                const content = document.getElementById("tab-" + t);
-                if (content) content.classList.0 ? content.classList.remove("active") : content.classList.remove("active");
-            });
-
-            // Corrección limpia para limpiar clases
             tabs.forEach(t => {
                 document.getElementById("tab-" + t).classList.remove("active");
             });
