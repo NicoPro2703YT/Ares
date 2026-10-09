@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clan Ares - Sitio Oficial</title>
+    <style>
+        :root {
+            --orange-primary: #ff6600;
+            --orange-glow: #ff8800;
+            --bg-dark: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --card-border: #2a2a2a;
+            --text-light: #f0f0f0;
+            --text-dim: #a0a0a0;
+            --red-alert: #e74c3c;
+            --gold: #f39c12;
+            --purple: #9b59b6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- PANTALLA DE BLOQUEO / LOGIN --- */
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border: 2px solid var(--orange-primary);
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 0 25px rgba(255, 102, 0, 0.3);
+            text-align: center;
+        }
+
+        .auth-header img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid var(--orange-primary);
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--card-border);
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .auth-tab-btn.active {
+            color: var(--orange-primary);
+            border-bottom: 2px solid var(--orange-primary);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .auth-form label {
+            font-size: 0.9em;
+            color: var(--text-dim);
+        }
+
+        .auth-form input, .auth-form select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            background: #111;
+            color: #fff;
+            outline: none;
+        }
+
+        .auth-form input:focus, .auth-form select:focus {
+            border-color: var(--orange-primary);
+        }
+
+        .btn-submit {
+            background: var(--orange-primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: var(--orange-glow);
+            box-shadow: 0 0 10px var(--orange-glow);
+        }
+
+        .error-msg {
+            color: var(--red-alert);
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* --- CABECERA Y NAVEGACIÓN PRINCIPAL --- */
+        header {
+            background: #141414;
+            border-bottom: 2px solid var(--orange-primary);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--orange-primary);
+            object-fit: cover;
+        }
+
+        .brand-title h1 {
+            font-size: 1.5rem;
+            color: var(--orange-primary);
+            letter-spacing: 1px;
+        }
+
+        .user-panel {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #1f1f1f;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .user-role {
+            font-size: 0.8em;
+            color: var(--gold);
+        }
+
+        .btn-logout {
+            background: #333;
+            border: none;
+            color: #aaa;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .btn-logout:hover {
+            background: var(--red-alert);
+            color: white;
+        }
+
+        /* --- SERVIDOR SELECTOR (SOLO DUEÑO) --- */
+        .server-selector-bar {
+            background: #111;
+            padding: 10px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .server-banner {
+            background: linear-gradient(90deg, #1f1f1f 0%, #2a180b 100%);
+            border-left: 5px solid var(--orange-primary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .status-online {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+
+        .status-offline {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        /* --- NAVEGACIÓN INTERNA --- */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--card-border);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--orange-primary);
+            border-bottom-color: var(--orange-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- CONTENIDO DE MÓDULOS --- */
+        .content-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .content-card.warning-card {
+            border-left: 4px solid var(--red-alert);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #252525;
+        }
+
+        .card-title {
+            color: var(--orange-glow);
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .card-date {
+            font-size: 0.8em;
+            color: var(--text-dim);
+        }
+
+        .btn-delete-post {
+            background: var(--red-alert);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-top: 10px;
+            float: right;
+            font-weight: bold;
+        }
+
+        .btn-delete-post:hover {
+            opacity: 0.85;
+        }
+
+        /* --- REGLAS DE NAUTICMC --- */
+        .rules-container {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .rules-header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 15px;
+        }
+
+        .rule-item {
+            margin-bottom: 18px;
+            background: #141414;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border-left: 3px solid var(--orange-primary);
+        }
+
+        .rule-title {
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .rule-desc {
+            color: var(--text-dim);
+            font-size: 0.95em;
+        }
+
+        .rule-punishment {
+            color: var(--gold);
+            font-size: 0.85em;
+            margin-top: 4px;
+        }
+
+        /* --- PANEL ADMINISTRATIVO / MODERACIÓN --- */
+        .admin-box {
+            background: #1a1510;
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .admin-box h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: var(--text-dim);
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px;
+            background: #111;
+            border: 1px solid var(--card-border);
+            color: white;
+            border-radius: 4px;
+        }
+
+        .user-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .user-list-table th, .user-list-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .user-list-table th {
+            background: #222;
+            color: var(--orange-primary);
+        }
+
+        .btn-action {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .btn-ban {
+            background: var(--red-alert);
+            color: white;
+        }
+
+        .warn-detail-item {
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }
+        .warn-detail-label {
+            color: var(--gold);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY DE BLOQUEO / AUTENTICACIÓN -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-header">
+                <!-- Guerrero Calabaza Incrustado -->
+                <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="48" fill="#000" stroke="#ff6600" stroke-width="3"/>
+                    <path d="M50 12 C53 6, 58 4, 60 2 C55 4, 52 7, 50 12 Z" fill="#2e7d32"/>
+                    <path d="M22 50 Q22 22 50 22 Q78 22 78 50 Q78 78 50 78 Q22 78 22 50 Z" fill="#e67e22" stroke="#ff6600" stroke-width="2"/>
+                    <path d="M32 50 Q32 28 50 28 Q68 28 68 50 Q68 72 50 72 Q32 72 32 50 Z" fill="#d35400"/>
+                    <polygon points="34,40 43,40 38,32" fill="#000"/>
+                    <polygon points="57,40 66,40 62,32" fill="#000"/>
+                    <polygon points="48,46 52,46 50,42" fill="#000"/>
+                    <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L50 64 L43 60 L37 64 Z" fill="#000"/>
+                </svg>
+                <h2 style="color: var(--orange-primary);">Clan Ares</h2>
+                <p style="font-size: 0.85em; color: var(--text-dim);">Acceso Exclusivo</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tab-login-btn" onclick="switchAuthTab('login')">Iniciar Sesión</button>
+                <button class="auth-tab-btn" id="tab-register-btn" onclick="switchAuthTab('register')">Registrarse</button>
+            </div>
+
+            <!-- FORMULARIO LOGIN -->
+            <form id="form-login" class="auth-form" onsubmit="handleLogin(event)">
+                <div>
+                    <label>Usuario</label>
+                    <input type="text" id="login-username" required placeholder="Tu nombre de usuario">
+                </div>
+                <div>
+                    <label>Contraseña</label>
+                    <input type="password" id="login-password" required placeholder="Tu contraseña">
+                </div>
+                <div id="login-error" class="error-msg">Usuario o contraseña incorrectos.</div>
+                <button type="submit" class="btn-submit">Entrar al Portal</button>
+            </form>
+
+            <!-- FORMULARIO REGISTRO -->
+            <form id="form-register" class="auth-form" onsubmit="handleRegister(event)" style="display: none;">
+                <div>
+                    <label>Nombre de Usuario (Pon tu nombre de Usuario de Minecraft)</label>
+                    <input type="text" id="reg-username" required placeholder="Pon tu nombre de Usuario de Minecraft">
+                </div>
+                <div>
+                    <label>Contraseña</label>
+                    <input type="password" id="reg-password" required placeholder="Crea una contraseña">
+                </div>
+                <div>
+                    <label>Selecciona tu Servidor Principal</label>
+                    <select id="reg-server" required>
+                        <option value="NauticMC">NauticMC</option>
+                        <option value="OlimpoCraft">OlimpoCraft</option>
+                        <option value="MineVoid">MineVoid</option>
+                    </select>
+                </div>
+                <div id="reg-error" class="error-msg">Este dispositivo/IP ya tiene una cuenta registrada.</div>
+                <button type="submit" class="btn-submit">Crear Cuenta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CABECERA PRINCIPAL -->
+    <header>
+        <div class="brand-container">
+            <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="#000" stroke="#ff6600" stroke-width="3"/>
+                <path d="M50 12 C53 6, 58 4, 60 2 C55 4, 52 7, 50 12 Z" fill="#2e7d32"/>
+                <path d="M22 50 Q22 22 50 22 Q78 22 78 50 Q78 78 50 78 Q22 78 22 50 Z" fill="#e67e22" stroke="#ff6600" stroke-width="2"/>
+                <path d="M32 50 Q32 28 50 28 Q68 28 68 50 Q68 72 50 72 Q32 72 32 50 Z" fill="#d35400"/>
+                <polygon points="34,40 43,40 38,32" fill="#000"/>
+                <polygon points="57,40 66,40 62,32" fill="#000"/>
+                <polygon points="48,46 52,46 50,42" fill="#000"/>
+                <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L50 64 L43 60 L37 64 Z" fill="#000"/>
+            </svg>
+            <div class="brand-title">
+                <h1>CLAN ARES</h1>
+                <p style="font-size: 0.8em; color: var(--text-dim);">Portal Oficial de Miembros</p>
+            </div>
+        </div>
+
+        <div class="user-panel">
+            <div class="user-info">
+                <div class="user-name" id="display-username">Cargando...</div>
+                <div class="user-role" id="display-role">Miembro</div>
+            </div>
+            <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <!-- BARRA EXCLUSIVA PARA EL DUEÑO -->
+    <div id="owner-server-bar" class="server-selector-bar" style="display: none;">
+        <span style="font-size: 0.85em; color: var(--gold); font-weight: bold;">[Modo Dueño] Cambiar Servidor:</span>
+        <select id="owner-server-select" onchange="changeServerOwner(this.value)" style="padding: 4px 8px; background: #222; color: #fff; border: 1px solid var(--orange-primary); border-radius: 4px;">
+            <option value="NauticMC">NauticMC</option>
+            <option value="OlimpoCraft">OlimpoCraft</option>
+            <option value="MineVoid">MineVoid</option>
+        </select>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main>
+        <div class="server-banner">
+            <div>
+                <h2 id="server-title-display">Servidor: NauticMC</h2>
+                <p style="font-size: 0.9em; color: var(--text-dim);" id="server-desc-display">Portal e Información Exclusiva del Clan</p>
+            </div>
+            <div id="server-status-badge" class="status-badge status-online">ONLINE</div>
+        </div>
+
+        <!-- SOLAPAS DE NAVEGACIÓN -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchMainTab('anuncios')">Anuncios</button>
+            <button class="tab-btn" onclick="switchMainTab('advertencias')">Advertencias</button>
+            <button class="tab-btn" onclick="switchMainTab('informacion')">Información General</button>
+            <button class="tab-btn" id="tab-admin-btn" style="display:none; color: var(--gold);" onclick="switchMainTab('admin')">Panel de Control</button>
+        </div>
+
+        <!-- SECCIÓN: ANUNCIOS -->
+        <div id="tab-anuncios" class="tab-content active">
+            <div id="anuncios-list"></div>
+        </div>
+
+        <!-- SECCIÓN: ADVERTENCIAS -->
+        <div id="tab-advertencias" class="tab-content">
+            <div id="advertencias-list"></div>
+        </div>
+
+        <!-- SECCIÓN: INFORMACIÓN GENERAL -->
+        <div id="tab-informacion" class="tab-content">
+            <div id="info-nautic" class="rules-container">
+                <div class="rules-header">
+                    <h2 style="color: var(--orange-primary); margin-bottom: 8px;">Normas del Clan Ares NauticMC</h2>
+                    <p>Bienvenido usuario, has llegado a las Normas del Clan Ares</p>
+                    <p style="margin-top: 5px; font-weight: bold; color: var(--gold);">Este clan esta creado por: NicoPro2703 y Máximo</p>
+                    <p style="font-style: italic; margin-top: 5px;">¡Ponte cómodo!</p>
+                </div>
+
+                <div class="rule-item"><div class="rule-title">1. Respeto total</div><div class="rule-desc">No se aceptan insultos, amenazas, ni actitudes tóxicas.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 4 años → Expulsión del clan.</div></div>
+                <div class="rule-item"><div class="rule-title">2. Lealtad</div><div class="rule-desc">No traiciones al clan.</div><div class="rule-punishment">Si lo rompes: Expulsión inmediata.</div></div>
+                <div class="rule-item"><div class="rule-title">3. Prohibido el espionaje</div><div class="rule-desc">No espíes sin permisos.</div><div class="rule-punishment">Si lo rompes: Expulsión permanente.</div></div>
+                <div class="rule-item"><div class="rule-title">4. Actividad mínima</div><div class="rule-desc">Si no apareces por el servidor ni por Discord.</div><div class="rule-punishment">Si lo rompes: 7 días sin actividad → Aviso. 14 días sin actividad → Revisión. 21 días → Expulsión (salvo aviso previo).</div></div>
+                <div class="rule-item"><div class="rule-title">5. No spam / flood</div><div class="rule-desc">No repitas mensajes.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Expulsión.</div></div>
+                <div class="rule-item"><div class="rule-title">6. Juego limpio</div><div class="rule-desc">Nada de hacks ni bugs en el clan.</div><div class="rule-punishment">Si lo rompes: Reportado en Nautic + Expulsión inmediata.</div></div>
+                <div class="rule-item"><div class="rule-title">7. Apoya</div><div class="rule-desc">Ayuda a los miembros del clan.</div><div class="rule-punishment">Si lo rompes: Advertencia → Revisión → Expulsión temporal.</div></div>
+                <div class="rule-item"><div class="rule-title">8. PvP con honor</div><div class="rule-desc">No mates aliados por diversión. Si es práctica o entrenamiento, que sea con acuerdo.</div><div class="rule-punishment">Si lo rompes: Advertencia → Revisión → Expulsión permanente.</div></div>
+                <div class="rule-item"><div class="rule-title">9. Respeta los rangos</div><div class="rule-desc">Sé respetuoso con los encargados.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Expulsión del clan.</div></div>
+                <div class="rule-item"><div class="rule-title">10. Canales</div><div class="rule-desc">Utiliza bien los canales, mira en su descripción qué hay que hacer.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 año.</div></div>
+                <div class="rule-item"><div class="rule-title">11. Construcción</div><div class="rule-desc">Está totalmente prohibido construir en la mena sin permisos.</div><div class="rule-punishment">Si lo rompes: Expulsión inmediata.</div></div>
+                <div class="rule-item"><div class="rule-title">12. Mensajes Privados</div><div class="rule-desc">Está prohibido enviar mensajes privados (DM) sin permiso a los Comandante, Líderes o Dueño del clan.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Expulsión temporal.</div></div>
+                <div class="rule-item"><div class="rule-title">13. No Griffeo</div><div class="rule-desc">Está totalmente prohibido destruir, romper, robar, mover o modificar construcciones, objetos o zonas pertenecientes a otros miembros del clan sin su permiso.</div><div class="rule-punishment">Si lo rompes: Expulsión del clan.</div></div>
+                <div class="rule-item"><div class="rule-title">14. Prohibición de mendicidad</div><div class="rule-desc">Queda prohibido pedir dinero solo por estar "pobre". Toda solicitud de fondos debe incluir una justificación válida de su uso (proyectos, compras específicas, etc).</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión temporal.</div></div>
+                <div class="rule-item"><div class="rule-title">15. Prohibido promocionar o crear otros servidores</div><div class="rule-desc">Está totalmente prohibido promocionar, publicitar o invitar a miembros del clan a otros servidores de Minecraft, así como crear servidores propios con la intención de competir o llevarse miembros del Clan Ares sin autorización.</div><div class="rule-punishment">Si lo rompes: Advertencia → Revisión → Mute temporal → Expulsión del clan.</div></div>
+                <div class="rule-item"><div class="rule-title">16. Prohibido mencionar</div><div class="rule-desc">Está prohibido mencionar (@mention) a Lider, Reclutadores o Dueños. Queda especialmente prohibido hacer menciones o mencionar repetidamente a una persona.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión del clan.</div></div>
+                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda strictly prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
+            </div>
+
+            <div id="info-other" class="rules-container" style="display: none;">
+                <h2 style="color: var(--orange-primary); margin-bottom: 10px;">Información General</h2>
+                <p>Bienvenido a la sección oficial del clan en este servidor.</p>
+                <p style="margin-top: 10px; color: var(--text-dim);">Actualmente este servidor se encuentra en estado <span style="color: var(--red-alert); font-weight: bold;">OFFLINE</span>. Las regulaciones e información se publicarán cuando esté activo.</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: PANEL DE ADMINISTRACIÓN Y MODERACIÓN -->
+        <div id="tab-admin" class="tab-content">
+            <div class="admin-box">
+                <h3>Publicar Mensaje Oficial</h3>
+                <div class="form-group">
+                    <label>Tipo de Publicación</label>
+                    <select id="post-type" onchange="toggleFormFields()">
+                        <option value="anuncio">Anuncio</option>
+                        <option value="advertencia">Advertencia</option>
+                    </select>
+                </div>
+
+                <div id="group-anuncio">
+                    <div class="form-group">
+                        <label>Título del Anuncio</label>
+                        <input type="text" id="post-title" placeholder="Título del anuncio">
+                    </div>
+                    <div class="form-group">
+                        <label>Contenido</label>
+                        <textarea id="post-body" rows="3" placeholder="Escribe el anuncio..."></textarea>
+                    </div>
+                </div>
+
+                <div id="group-advertencia" style="display: none;">
+                    <div class="form-group">
+                        <label>Usuario</label>
+                        <input type="text" id="warn-user" placeholder="Nombre de usuario registrado">
+                    </div>
+                    <div class="form-group">
+                        <label>Nick (Minecraft)</label>
+                        <input type="text" id="warn-nick" placeholder="Nick exacto en Minecraft">
+                    </div>
+                    <div class="form-group">
+                        <label>Norma Incumplida</label>
+                        <select id="warn-rule">
+                            <option value="1">Norma 1 - Respeto total</option>
+                            <option value="2">Norma 2 - Lealtad</option>
+                            <option value="3">Norma 3 - Prohibido el espionaje</option>
+                            <option value="4">Norma 4 - Actividad mínima</option>
+                            <option value="5">Norma 5 - No spam / flood</option>
+                            <option value="6">Norma 6 - Juego limpio</option>
+                            <option value="7">Norma 7 - Apoya</option>
+                            <option value="8">Norma 8 - PvP con honor</option>
+                            <option value="9">Norma 9 - Respeta los rangos</option>
+                            <option value="10">Norma 10 - Canales</option>
+                            <option value="11">Norma 11 - Construcción</option>
+                            <option value="12">Norma 12 - Mensajes Privados</option>
+                            <option value="13">Norma 13 - No Griffeo</option>
+                            <option value="14">Norma 14 - Prohibición de mendicidad</option>
+                            <option value="15">Norma 15 - Prohibido promocionar o crear otros servidores</option>
+                            <option value="16">Norma 16 - Prohibido mencionar</option>
+                            <option value="17">Norma 17 - Prohibido el abandono de trabajos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado / Sanción</label>
+                        <select id="warn-status">
+                            <option value="Advertencia (1/2)">Advertencia (1/2)</option>
+                            <option value="Advertencia (2/2)">Advertencia (2/2)</option>
+                            <option value="Revisión">Revisión</option>
+                            <option value="Expulsión">Expulsión</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn-submit" onclick="publishPost()">Publicar</button>
+            </div>
+
+            <div class="admin-box">
+                <h3>Gestión de Miembros y Sanciones por IP</h3>
+                <table class="user-list-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Servidor</th>
+                            <th>Rango Actual</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-admin-list"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const OWNER_PASS = "NicoDueño2703XD";
+
+        const DEFAULT_USERS = [
+            { username: "NicoPro2703", password: OWNER_PASS, server: "GLOBAL", role: "Dueño", ipHash: "DEVICE_OWNER_ARES" },
+            { username: "Máximo", password: "123", server: "NauticMC", role: "Líder - NauticMC", ipHash: "DEVICE_MAXIMO" }
+        ];
+
+        // Se inician las listas vacías para no tener anuncios ni advertencias por defecto
+        let posts = JSON.parse(localStorage.getItem("ares_posts")) || [];
+        let users = JSON.parse(localStorage.getItem("ares_users")) || DEFAULT_USERS;
+        let bannedIPs = JSON.parse(localStorage.getItem("ares_banned_ips")) || [];
+        let currentUser = JSON.parse(localStorage.getItem("ares_current_session")) || null;
+        let currentActiveServer = "NauticMC";
+
+        // Asegurar que las credenciales de NicoPro2703 estén siempre bien configuradas
+        let ownerIdx = users.findIndex(u => u.username.toLowerCase() === "nicopro2703");
+        if (ownerIdx !== -1) {
+            users[ownerIdx].password = OWNER_PASS;
+        } else {
+            users.push({ username: "NicoPro2703", password: OWNER_PASS, server: "GLOBAL", role: "Dueño", ipHash: "DEVICE_OWNER_ARES" });
+        }
+        localStorage.setItem("ares_users", JSON.stringify(users));
+
+        let currentDeviceIP = localStorage.getItem("ares_device_ip");
+        if (!currentDeviceIP) {
+            currentDeviceIP = "IP_" + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem("ares_device_ip", currentDeviceIP);
+        }
+
+        window.onload = function() {
+            checkBannedStatus();
+            if (currentUser) {
+                initPortal();
+            } else {
+                document.getElementById("auth-overlay").style.display = "flex";
+            }
+        };
+
+        function checkBannedStatus() {
+            if (bannedIPs.includes(currentDeviceIP)) {
+                document.body.innerHTML = "<div style='color:white; text-align:center; padding:50px;'><h1>ACCESO BLOQUEADO</h1><p style='color:red;'>Tu IP / Dispositivo ha sido baneado del portal del Clan Ares.</p></div>";
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem("ares_users", JSON.stringify(users));
+            localStorage.setItem("ares_posts", JSON.stringify(posts));
+            localStorage.setItem("ares_banned_ips", JSON.stringify(bannedIPs));
+            localStorage.setItem("ares_current_session", JSON.stringify(currentUser));
+        }
+
+        function switchAuthTab(tab) {
+            document.getElementById("tab-login-btn").classList.toggle("active", tab === 'login');
+            document.getElementById("tab-register-btn").classList.toggle("active", tab === 'register');
+            document.getElementById("form-login").style.display = tab === 'login' ? 'flex' : 'none';
+            document.getElementById("form-register").style.display = tab === 'register' ? 'flex' : 'none';
+            document.getElementById("login-error").style.display = "none";
+            document.getElementById("reg-error").style.display = "none";
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById("login-username").value.trim();
+            const passwordInput = document.getElementById("login-password").value.trim();
+
+            const foundUser = users.find(u => u.username.toLowerCase() === usernameInput.toLowerCase() && u.password === passwordInput);
+
+            if (foundUser) {
+                currentUser = foundUser;
+                saveData();
+                document.getElementById("auth-overlay").style.display = "none";
+                initPortal();
+            } else {
+                document.getElementById("login-error").innerText = "Usuario o contraseña incorrectos.";
+                document.getElementById("login-error").style.display = "block";
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById("reg-username").value.trim();
+            const passwordInput = document.getElementById("reg-password").value.trim();
+            const serverSelect = document.getElementById("reg-server").value;
+
+            const existingIPUser = users.find(u => u.ipHash === currentDeviceIP);
+            if (existingIPUser && usernameInput.toLowerCase() !== "nicopro2703") {
+                document.getElementById("reg-error").innerText = "Ya existe una cuenta registrada desde esta IP (" + existingIPUser.username + ").";
+                document.getElementById("reg-error").style.display = "block";
+                return;
+            }
+
+            if (users.find(u => u.username.toLowerCase() === usernameInput.toLowerCase())) {
+                document.getElementById("reg-error").innerText = "Ese usuario ya está registrado.";
+                document.getElementById("reg-error").style.display = "block";
+                return;
+            }
+
+            const isOwner = usernameInput.toLowerCase() === "nicopro2703";
+            const newUser = {
+                username: usernameInput,
+                password: passwordInput,
+                server: isOwner ? "GLOBAL" : serverSelect,
+                role: isOwner ? "Dueño" : "Miembro",
+                ipHash: currentDeviceIP
+            };
+
+            users.push(newUser);
+            currentUser = newUser;
+            saveData();
+
+            document.getElementById("auth-overlay").style.display = "none";
+            initPortal();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem("ares_current_session");
+            location.reload();
+        }
+
+        function initPortal() {
+            document.getElementById("display-username").innerText = currentUser.username;
+            document.getElementById("display-role").innerText = currentUser.role;
+
+            const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
+
+            if (isOwner) {
+                document.getElementById("owner-server-bar").style.display = "flex";
+                currentActiveServer = document.getElementById("owner-server-select").value;
+            } else {
+                document.getElementById("owner-server-bar").style.display = "none";
+                currentActiveServer = currentUser.server;
+            }
+
+            updateServerView();
+            checkAdminPermissions();
+        }
+
+        function changeServerOwner(serverVal) {
+            currentActiveServer = serverVal;
+            updateServerView();
+        }
+
+        function updateServerView() {
+            document.getElementById("server-title-display").innerText = "Servidor: " + currentActiveServer;
+            const badge = document.getElementById("server-status-badge");
+
+            if (currentActiveServer === "NauticMC") {
+                badge.innerText = "ONLINE";
+                badge.className = "status-badge status-online";
+                document.getElementById("info-nautic").style.display = "block";
+                document.getElementById("info-other").style.display = "none";
+            } else {
+                badge.innerText = "OFFLINE";
+                badge.className = "status-badge status-offline";
+                document.getElementById("info-nautic").style.display = "none";
+                document.getElementById("info-other").style.display = "block";
+            }
+
+            renderPosts();
+        }
+
+        function checkAdminPermissions() {
+            const role = currentUser.role;
+            const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
+            const isAdminRole = isOwner || role.includes("Líder") || role.includes("Comandante");
+
+            if (isAdminRole) {
+                document.getElementById("tab-admin-btn").style.display = "inline-block";
+                renderAdminUserList();
+            } else {
+                document.getElementById("tab-admin-btn").style.display = "none";
+            }
+        }
+
+        // --- SISTEMA DE RENDERIZADO Y ELIMINACIÓN CORREGIDO ---
+        function renderPosts() {
+            const anunciosContainer = document.getElementById("anuncios-list");
+            const advertenciasContainer = document.getElementById("advertencias-list");
+
+            anunciosContainer.innerHTML = "";
+            advertenciasContainer.innerHTML = "";
+
+            const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
+            const isAdmin = isOwner || currentUser.role.includes("Líder") || currentUser.role.includes("Comandante");
+
+            const filteredPosts = posts.filter(p => p.server === currentActiveServer);
+
+            filteredPosts.forEach(p => {
+                const card = document.createElement("div");
+                card.className = "content-card" + (p.type === "advertencia" ? " warning-card" : "");
+
+                let bodyContent = "";
+                if (p.type === "anuncio") {
+                    bodyContent = `<p>${p.content}</p>`;
+                } else {
+                    bodyContent = `
+                        <div class="warn-detail-item"><span class="warn-detail-label">Usuario:</span> ${p.targetUser}</div>
+                        <div class="warn-detail-item"><span class="warn-detail-label">Nick:</span> ${p.targetNick}</div>
+                        <div class="warn-detail-item"><span class="warn-detail-label">Norma Incumplida:</span> Norma ${p.ruleNum}</div>
+                        <div class="warn-detail-item"><span class="warn-detail-label">Sanción:</span> <span style="color:var(--red-alert); font-weight:bold;">${p.status}</span></div>
+                    `;
+                }
+
+                let deleteBtnHTML = isAdmin ? `<button class="btn-delete-post" onclick="deletePost(${p.id})">Eliminar</button>` : "";
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="card-title">${p.title || 'ADVERTENCIA OFICIAL'}</span>
+                        <span class="card-date">${p.date}</span>
+                    </div>
+                    <div class="card-body">
+                        ${bodyContent}
+                    </div>
+                    ${deleteBtnHTML}
+                    <div style="clear:both;"></div>
+                `;
+
+                if (p.type === "anuncio") {
+                    anunciosContainer.appendChild(card);
+                } else {
+                    advertenciasContainer.appendChild(card);
+                }
+            });
+
+            if (anunciosContainer.children.length === 0) {
+                anunciosContainer.innerHTML = "<p style='color:var(--text-dim);'>No hay anuncios para este servidor.</p>";
+            }
+            if (advertenciasContainer.children.length === 0) {
+                advertenciasContainer.innerHTML = "<p style='color:var(--text-dim);'>No hay advertencias registradas para este servidor.</p>";
+            }
+        }
+
+        // Función de eliminación arreglada
+        function deletePost(postId) {
+            if (confirm("¿Estás seguro de que deseas eliminar esta publicación?")) {
+                posts = posts.filter(p => String(p.id) !== String(postId));
+                saveData();
+                renderPosts();
+            }
+        }
+
+        function toggleFormFields() {
+            const type = document.getElementById("post-type").value;
+            document.getElementById("group-anuncio").style.display = type === "anuncio" ? "block" : "none";
+            document.getElementById("group-advertencia").style.display = type === "advertencia" ? "block" : "none";
+        }
+
+        function publishPost() {
+            const type = document.getElementById("post-type").value;
+            let newPost = {
+                id: Date.now(),
+                type: type,
+                server: currentActiveServer,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            if (type === "anuncio") {
+                const title = document.getElementById("post-title").value.trim();
+                const body = document.getElementById("post-body").value.trim();
+                if (!title || !body) { alert("Completa el título y contenido."); return; }
+
+                newPost.title = title;
+                newPost.content = body;
+            } else {
+                const userVal = document.getElementById("warn-user").value.trim();
+                const nickVal = document.getElementById("warn-nick").value.trim();
+                const ruleVal = document.getElementById("warn-rule").value;
+                const statusVal = document.getElementById("warn-status").value;
+
+                if (!userVal || !nickVal) { alert("Ingresa el usuario y el nick de Minecraft."); return; }
+
+                newPost.targetUser = userVal;
+                newPost.targetNick = nickVal;
+                newPost.ruleNum = ruleVal;
+                newPost.status = statusVal;
+                newPost.title = "Advertencia a " + nickVal;
+            }
+
+            posts.unshift(newPost);
+            saveData();
+            renderPosts();
+
+            document.getElementById("post-title").value = "";
+            document.getElementById("post-body").value = "";
+            document.getElementById("warn-user").value = "";
+            document.getElementById("warn-nick").value = "";
+            alert("Publicación realizada correctamente en " + currentActiveServer);
+        }
+
+        function renderAdminUserList() {
+            const tbody = document.getElementById("user-admin-list");
+            tbody.innerHTML = "";
+
+            users.forEach(u => {
+                if (u.username.toLowerCase() === "nicopro2703") return;
+
+                const tr = document.createElement("tr");
+
+                const availableRoles = [
+                    "Miembro",
+                    `Líder - ${currentActiveServer}`,
+                    `Comandante - ${currentActiveServer}`,
+                    `Reclutador - ${currentActiveServer}`
+                ];
+
+                let roleOptionsHTML = availableRoles.map(r => 
+                    `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`
+                ).join("");
+
+                tr.innerHTML = `
+                    <td><strong>${u.username}</strong></td>
+                    <td>${u.server}</td>
+                    <td>
+                        <select onchange="updateUserRole('${u.username}', this.value)" style="padding:4px; background:#111; color:white; border:1px solid #444; border-radius:4px;">
+                            ${roleOptionsHTML}
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn-action btn-ban" onclick="banUserIP('${u.username}', '${u.ipHash}')">Banear IP</button>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateUserRole(targetUsername, newRole) {
+            const target = users.find(u => u.username === targetUsername);
+            if (target) {
+                target.role = newRole;
+                saveData();
+                alert(`Rango de ${targetUsername} actualizado a: ${newRole}`);
+            }
+        }
+
+        function banUserIP(targetUsername, targetIP) {
+            if (confirm(`¿Deseas banear por IP a ${targetUsername}?`)) {
+                if (!bannedIPs.includes(targetIP)) {
+                    bannedIPs.push(targetIP);
+                }
+                users = users.filter(u => u.username !== targetUsername);
+                saveData();
+                renderAdminUserList();
+                alert(`El usuario ${targetUsername} ha sido baneado.`);
+            }
+        }
+
+        function switchMainTab(tabName) {
+            const tabs = ['anuncios', 'advertencias', 'informacion', 'admin'];
+            tabs.forEach(t => {
+                const content = document.getElementById("tab-" + t);
+                if (content) content.classList.remove("active");
+            });
+
+            const btns = document.querySelectorAll(".nav-tabs .tab-btn");
+            btns.forEach(b => b.classList.remove("active"));
+
+            document.getElementById("tab-" + tabName).classList.add("active");
+            event.target.classList.add("active");
+        }
+    </script>
+</body>
+</html>
