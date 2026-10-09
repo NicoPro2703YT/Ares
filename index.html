@@ -40,7 +40,7 @@
             position: relative;
         }
 
-        /* --- BOTÓN DE VERSIÓN EXCLUSIVO (LÍDER/DUEÑO) --- */
+        /* --- BOTÓN DE VERSIÓN EXCLUSIVO --- */
         #version-badge {
             position: fixed;
             top: 15px;
@@ -56,7 +56,7 @@
             z-index: 1000;
             transition: 0.3s;
             box-shadow: 0 0 10px rgba(255, 102, 0, 0.2);
-            display: none; /* Se activa mediante JS si es Dueño/Líder */
+            display: none;
         }
 
         #version-badge:hover {
@@ -66,14 +66,14 @@
         }
 
         /* --- MODAL NOTAS DE LA VERSIÓN --- */
-        #version-modal {
+        #version-modal, #rickroll-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
             z-index: 10000;
             display: none;
             justify-content: center;
@@ -81,15 +81,16 @@
             padding: 20px;
         }
 
-        .version-card {
+        .version-card, .rickroll-card {
             background: var(--card-bg);
             border: 2px solid var(--gold);
             border-radius: 12px;
             padding: 25px;
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
             box-shadow: 0 0 30px rgba(243, 156, 18, 0.3);
             user-select: text;
+            text-align: center;
         }
 
         .version-card h3 {
@@ -105,6 +106,7 @@
         .version-list {
             list-style: none;
             margin-top: 10px;
+            text-align: left;
         }
 
         .version-list li {
@@ -131,12 +133,16 @@
             border-radius: 6px;
             cursor: pointer;
             margin-top: 15px;
-            float: right;
             font-weight: bold;
         }
 
-        .btn-close-modal:hover {
+        .btn-close-modal:hover:not(:disabled) {
             background: var(--red-alert);
+        }
+
+        .btn-close-modal:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
         /* PANTALLA LOGIN / REGISTRO */
@@ -538,6 +544,12 @@
             color: white;
         }
 
+        .btn-pass {
+            background: #27ae60;
+            color: white;
+            margin-right: 5px;
+        }
+
         .warn-detail-item {
             margin-bottom: 6px;
             font-size: 0.95em;
@@ -546,26 +558,57 @@
             color: var(--gold);
             font-weight: bold;
         }
+
+        /* BANNER DE NOTIFICACIONES PARA EL DUEÑO */
+        #owner-requests-box {
+            background: #2b1d0c;
+            border: 1px solid var(--gold);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .request-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #1a130a;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
 
     <!-- INSIGNIA DE VERSIÓN (ESQUINA SUPERIOR DERECHA) -->
-    <div id="version-badge" onclick="toggleVersionModal(true)">v1.0.0 📜</div>
+    <div id="version-badge" onclick="toggleVersionModal(true)">v1.1.0 📜</div>
 
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.0.0</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.1.0</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Base de Datos en la Nube:</strong> Integración completa con Firebase Realtime Database para sincronización global.</li>
-                <li><strong>Gestión de Roles Segura:</strong> Comandantes con permisos restringidos (solo banear IP, sin cambiar rangos).</li>
-                <li><strong>Protección de Código:</strong> Bloqueo de inspección de código (F12, Clic derecho y combos de teclado).</li>
-                <li><strong>Mantenimiento de Sesión:</strong> Corrección del cierre de sesión automático al recargar la página.</li>
-                <li><strong>Multiservidor:</strong> Soporte dinámico para NauticMC, OlimpoCraft y MineVoid.</li>
+                <li><strong>Visibilidad de Rangos Restringida:</strong> Columna de roles visible únicamente para Líderes y Dueño.</li>
+                <li><strong>Sistema de Permisos de Contraseña:</strong> Reclutadores, Comandantes y Líderes pueden solicitar ver contraseñas con aprobación en tiempo real del Dueño.</li>
+                <li><strong>Protección contra Clones "Ares":</strong> Detección automática del nombre Ares en el registro con reproducción forzada de video anticlones.</li>
+                <li><strong>Base de Datos en la Nube:</strong> Sincronización continua de usuarios, avisos y sanciones en Firebase.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
-            <div style="clear:both;"></div>
+        </div>
+    </div>
+
+    <!-- MODAL RICKROLL (PROTECCIÓN NOMBRE ARES) -->
+    <div id="rickroll-modal">
+        <div class="rickroll-card">
+            <h3 style="color:var(--orange-primary); margin-bottom:15px;">⚠️ ACCESO NO PERMITIDO</h3>
+            <p style="font-size:0.9em; color:var(--text-dim); margin-bottom:15px;">Intentaste registrarte con el nombre del Clan/Dueño. Debes ver el video completo para poder reintentar con otro nombre.</p>
+            <video id="rickroll-video" width="100%" controls style="border-radius:8px; border:1px solid var(--orange-primary);">
+                <source src="https://shattereddisk.github.io/rickroll/rickroll.mp4" type="video/mp4">
+                Tu navegador no soporta el reproductor de video.
+            </video>
+            <button id="btn-skip-rickroll" class="btn-close-modal" disabled onclick="closeRickrollModal()" style="margin-top:15px; width:100%;">Viendo video... (Debes esperar al final)</button>
         </div>
     </div>
 
@@ -638,7 +681,7 @@
                 <polygon points="34,40 43,40 38,32" fill="#000"/>
                 <polygon points="57,40 66,40 62,32" fill="#000"/>
                 <polygon points="48,46 52,46 50,42" fill="#000"/>
-                <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L43 60 L37 64 Z" fill="#000"/>
+                <path d="M30 56 L36 52 L42 56 L48 52 L54 56 L60 52 L68 56 L63 64 L57 60 L50 64 L43 60 L37 64 Z" fill="#000"/>
             </svg>
             <div class="brand-title">
                 <h1>CLAN ARES</h1>
@@ -724,6 +767,12 @@
         </div>
 
         <div id="tab-admin" class="tab-content">
+            <!-- CAJA DE SOLICITUDES DE CONTRASEÑA (SOLO DUEÑO NICO) -->
+            <div id="owner-requests-box">
+                <h3 style="color:var(--gold); font-size:1.1em; margin-bottom:5px;">🔔 Solicitudes de Permiso de Contraseña</h3>
+                <div id="requests-list"></div>
+            </div>
+
             <div class="admin-box">
                 <h3>Publicar Mensaje Oficial</h3>
                 <div class="form-group">
@@ -794,10 +843,11 @@
                 <h3>Gestión de Miembros y Sanciones por IP</h3>
                 <table class="user-list-table">
                     <thead>
-                        <tr>
+                        <tr id="admin-table-header">
                             <th>Usuario</th>
                             <th>Servidor</th>
-                            <th>Rango Actual</th>
+                            <th>Contraseña</th>
+                            <th id="th-rango">Rango Actual</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -808,7 +858,7 @@
     </main>
 
     <script>
-        // BLOQUEO DE INSPECCIÓN
+        // BLOQUEO DE INSPECCIÓN Y CLIC DERECHO
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', event => {
             if (event.key === "F12" || 
@@ -836,6 +886,7 @@
         let users = {};
         let posts = {};
         let bannedIPs = {};
+        let passRequests = {};
         let currentUser = JSON.parse(localStorage.getItem("ares_current_session")) || null;
         let currentActiveServer = "NauticMC";
 
@@ -845,7 +896,7 @@
             localStorage.setItem("ares_device_ip", currentDeviceIP);
         }
 
-        // Cuenta por defecto del dueño
+        // Cuenta del dueño
         db.ref("users/NicoPro2703").set({
             username: "NicoPro2703",
             password: OWNER_PASS,
@@ -879,8 +930,33 @@
             }
         });
 
+        // Escuchar solicitudes de contraseña
+        db.ref("passRequests").on("value", snapshot => {
+            passRequests = snapshot.val() || {};
+            if (currentUser && currentUser.username.toLowerCase() === "nicopro2703") {
+                renderOwnerRequests();
+            }
+            if (currentUser) renderAdminUserList();
+        });
+
         function toggleVersionModal(show) {
             document.getElementById("version-modal").style.display = show ? "flex" : "none";
+        }
+
+        // LÓGICA DE RICKROLL Y BUCLE DE VIDEO
+        const rickrollVideo = document.getElementById("rickroll-video");
+        rickrollVideo.onended = function() {
+            const btn = document.getElementById("btn-skip-rickroll");
+            btn.disabled = false;
+            btn.innerText = "Cerrar y Crear Otra Cuenta";
+            btn.style.background = "var(--orange-primary)";
+        };
+
+        function closeRickrollModal() {
+            document.getElementById("rickroll-modal").style.display = "none";
+            rickrollVideo.pause();
+            rickrollVideo.currentTime = 0;
+            document.getElementById("reg-username").value = "";
         }
 
         function switchAuthTab(tab) {
@@ -915,6 +991,17 @@
             const usernameInput = document.getElementById("reg-username").value.trim();
             const passwordInput = document.getElementById("reg-password").value.trim();
             const serverSelect = document.getElementById("reg-server").value;
+
+            // DETECCIÓN DE NOMBRE ARES
+            if (usernameInput.toLowerCase().includes("ares")) {
+                document.getElementById("rickroll-modal").style.display = "flex";
+                rickrollVideo.play();
+                const btn = document.getElementById("btn-skip-rickroll");
+                btn.disabled = true;
+                btn.innerText = "Viendo video... (Debes esperar al final)";
+                btn.style.background = "#333";
+                return;
+            }
 
             const existingIPUser = Object.values(users).find(u => u.ipHash === currentDeviceIP);
             if (existingIPUser && usernameInput.toLowerCase() !== "nicopro2703") {
@@ -959,7 +1046,6 @@
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
             const isLeader = currentUser.role.includes("Líder");
 
-            // Mostrar insignia de versión ÚNICAMENTE a Dueño o Líder
             if (isOwner || isLeader) {
                 document.getElementById("version-badge").style.display = "block";
             } else {
@@ -968,9 +1054,11 @@
 
             if (isOwner) {
                 document.getElementById("owner-server-bar").style.display = "flex";
+                document.getElementById("owner-requests-box").style.display = "block";
                 currentActiveServer = document.getElementById("owner-server-select").value;
             } else {
                 document.getElementById("owner-server-bar").style.display = "none";
+                document.getElementById("owner-requests-box").style.display = "none";
                 currentActiveServer = currentUser.server;
             }
 
@@ -1005,7 +1093,7 @@
         function checkAdminPermissions() {
             const role = currentUser.role;
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
-            const isAdminRole = isOwner || role.includes("Líder") || role.includes("Comandante");
+            const isAdminRole = isOwner || role.includes("Líder") || role.includes("Comandante") || role.includes("Reclutador");
 
             if (isAdminRole) {
                 document.getElementById("tab-admin-btn").style.display = "inline-block";
@@ -1127,40 +1215,64 @@
             alert("Publicado con éxito en la nube.");
         }
 
+        // RENDERIZADO DE TABLA DE MIEMBROS CON PERMISOS Y VISIBILIDAD DE RANGOS
         function renderAdminUserList() {
             const tbody = document.getElementById("user-admin-list");
             tbody.innerHTML = "";
 
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
             const isLeader = currentUser.role.includes("Líder");
-            const canChangeRole = isOwner || isLeader;
+            const canSeeRoles = isOwner || isLeader; // Solo Dueño y Líder ven rangos
+
+            // Mostrar/ocultar encabezado de rango
+            document.getElementById("th-rango").style.display = canSeeRoles ? "table-cell" : "none";
 
             Object.values(users).forEach(u => {
                 if (u.username.toLowerCase() === "nicopro2703") return;
 
                 const tr = document.createElement("tr");
 
-                const availableRoles = [
-                    "Miembro",
-                    `Líder - ${currentActiveServer}`,
-                    `Comandante - ${currentActiveServer}`,
-                    `Reclutador - ${currentActiveServer}`
-                ];
+                // Lógica de visualización de contraseña con permiso
+                let passDisplay = "••••••••";
+                let passReqKey = `${currentUser.username}_${u.username}`;
+                
+                if (isOwner) {
+                    passDisplay = u.password;
+                } else if (passRequests[passReqKey] === "APPROVED") {
+                    passDisplay = u.password;
+                } else if (passRequests[passReqKey] === "PENDING") {
+                    passDisplay = "<span style='color:var(--gold); font-size:0.8em;'>Pendiente...</span>";
+                } else {
+                    passDisplay = `<button class="btn-action btn-pass" onclick="requestPassPermission('${u.username}')">Ver Contraseña</button>`;
+                }
 
-                let roleOptionsHTML = availableRoles.map(r => 
-                    `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`
-                ).join("");
+                let roleColHTML = "";
+                if (canSeeRoles) {
+                    const availableRoles = [
+                        "Miembro",
+                        `Líder - ${currentActiveServer}`,
+                        `Comandante - ${currentActiveServer}`,
+                        `Reclutador - ${currentActiveServer}`
+                    ];
 
-                const selectDisabledAttr = canChangeRole ? "" : "disabled";
+                    let roleOptionsHTML = availableRoles.map(r => 
+                        `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`
+                    ).join("");
+
+                    roleColHTML = `
+                        <td>
+                            <select onchange="updateUserRole('${u.username}', this.value)" style="padding:4px; background:#111; color:white; border:1px solid #444; border-radius:4px;">
+                                ${roleOptionsHTML}
+                            </select>
+                        </td>
+                    `;
+                }
 
                 tr.innerHTML = `
                     <td><strong>${u.username}</strong></td>
                     <td>${u.server}</td>
-                    <td>
-                        <select ${selectDisabledAttr} onchange="updateUserRole('${u.username}', this.value)" style="padding:4px; background:#111; color:white; border:1px solid #444; border-radius:4px; ${!canChangeRole ? 'opacity:0.5; cursor:not-allowed;' : ''}">
-                            ${roleOptionsHTML}
-                        </select>
-                    </td>
+                    <td>${passDisplay}</td>
+                    ${roleColHTML}
                     <td>
                         <button class="btn-action btn-ban" onclick="banUserIP('${u.username}', '${u.ipHash}')">Banear IP</button>
                     </td>
@@ -1168,6 +1280,47 @@
 
                 tbody.appendChild(tr);
             });
+        }
+
+        // SOLICITAR PERMISO PARA VER CONTRASEÑA
+        function requestPassPermission(targetUser) {
+            let reqKey = `${currentUser.username}_${targetUser}`;
+            db.ref("passRequests/" + reqKey).set({
+                requester: currentUser.username,
+                target: targetUser,
+                status: "PENDING"
+            });
+            alert("Solicitud enviada al Dueño (NicoPro2703). Se mostrará en cuanto la apruebe.");
+        }
+
+        // RENDERIZAR BANNER DE NOTIFICACIONES PARA EL DUEÑO
+        function renderOwnerRequests() {
+            const list = document.getElementById("requests-list");
+            list.innerHTML = "";
+
+            let pendingReqs = Object.entries(passRequests).filter(([k, v]) => v.status === "PENDING");
+
+            if (pendingReqs.length === 0) {
+                list.innerHTML = "<p style='font-size:0.85em; color:var(--text-dim);'>No hay solicitudes pendientes.</p>";
+                return;
+            }
+
+            pendingReqs.forEach(([key, req]) => {
+                const item = document.createElement("div");
+                item.className = "request-item";
+                item.innerHTML = `
+                    <span style="font-size:0.9em;">El usuario <strong>${req.requester}</strong> solicitó ver la contraseña de <strong>${req.target}</strong>.</span>
+                    <div>
+                        <button class="btn-action" style="background:#27ae60; color:white; margin-right:5px;" onclick="respondPassRequest('${key}', 'APPROVED')">Aceptar</button>
+                        <button class="btn-action btn-ban" onclick="respondPassRequest('${key}', 'REJECTED')">Rechazar</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function respondPassRequest(reqKey, status) {
+            db.ref("passRequests/" + reqKey + "/status").set(status);
         }
 
         function updateUserRole(targetUsername, newRole) {
