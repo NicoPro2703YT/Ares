@@ -53,29 +53,23 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* --- BOTÓN DE VERSIÓN Y CONFIGURACIÓN --- */
-        #version-badge {
-            position: fixed;
-            top: 15px;
-            right: 75px;
+        /* --- INSIGNIA DE VERSIÓN INTEGRADA --- */
+        .version-inline-btn {
             background: rgba(255, 102, 0, 0.15);
             border: 1px solid var(--orange-primary);
             color: var(--orange-glow);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
             font-weight: bold;
             cursor: pointer;
-            z-index: 1000;
             transition: 0.3s;
-            box-shadow: 0 0 10px rgba(255, 102, 0, 0.2);
             display: none;
         }
 
-        #version-badge:hover {
+        .version-inline-btn:hover {
             background: var(--orange-primary);
             color: #fff;
-            box-shadow: 0 0 15px var(--orange-glow);
         }
 
         /* --- CAMPANA DE NOTIFICACIONES --- */
@@ -85,7 +79,7 @@
         }
 
         .btn-bell {
-            background: #222;
+            background: var(--card-bg);
             border: 1px solid var(--card-border);
             color: var(--text-light);
             padding: 8px 12px;
@@ -117,7 +111,7 @@
             position: absolute;
             right: 0;
             top: 45px;
-            width: 300px;
+            width: 290px;
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 8px;
@@ -329,7 +323,7 @@
         header {
             background: var(--header-bg);
             border-bottom: 2px solid var(--orange-primary);
-            padding: 15px 30px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -341,36 +335,43 @@
         .brand-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .brand-logo {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             border: 2px solid var(--orange-primary);
             object-fit: cover;
         }
 
         .brand-title h1 {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: var(--orange-primary);
             letter-spacing: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .user-panel {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             background: var(--card-bg);
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 8px;
             border: 1px solid var(--card-border);
         }
 
         .user-avatar-small {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             object-fit: cover;
             border: 1px solid var(--orange-primary);
@@ -384,11 +385,12 @@
 
         .user-name {
             font-weight: bold;
+            font-size: 0.9em;
             color: var(--text-light);
         }
 
         .user-role {
-            font-size: 0.8em;
+            font-size: 0.75em;
             color: var(--gold);
         }
 
@@ -396,7 +398,7 @@
             background: #333;
             border: none;
             color: #aaa;
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.8em;
@@ -409,7 +411,7 @@
 
         .server-selector-bar {
             background: var(--card-bg);
-            padding: 10px 30px;
+            padding: 10px 20px;
             display: flex;
             align-items: center;
             gap: 15px;
@@ -662,7 +664,6 @@
             font-weight: bold;
         }
 
-        /* BANNER DE NOTIFICACIONES PARA EL DUEÑO */
         #owner-requests-box {
             background: var(--card-bg);
             border: 1px solid var(--gold);
@@ -684,21 +685,37 @@
             gap: 10px;
         }
 
-        /* --- AJUSTES DE DISEÑO ADAPTATIVO (RESPONSIVE MÓVIL) --- */
+        /* --- DISEÑO MÓVIL OPTIMIZADO --- */
         @media (max-width: 768px) {
             header {
-                padding: 10px 15px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .user-panel {
-                width: 100%;
+                padding: 10px;
+                flex-direction: row;
                 justify-content: space-between;
             }
 
+            .brand-title h1 {
+                font-size: 1.1rem;
+            }
+
+            .brand-title p {
+                display: none;
+            }
+
+            .header-actions {
+                gap: 8px;
+            }
+
+            .user-panel {
+                padding: 4px 8px;
+            }
+
+            .notif-dropdown {
+                right: -40px;
+                width: 260px;
+            }
+
             .server-selector-bar {
-                padding: 10px 15px;
+                padding: 10px;
                 flex-direction: column;
                 align-items: flex-start;
             }
@@ -716,29 +733,19 @@
             .auth-card {
                 padding: 20px 15px;
             }
-
-            #version-badge {
-                top: 10px;
-                right: 10px;
-                font-size: 0.75em;
-                padding: 4px 8px;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- INSIGNIA DE VERSIÓN -->
-    <div id="version-badge" onclick="toggleVersionModal(true)">v1.2.3 📜</div>
-
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.2.3</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.2.4</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Estabilidad de Autenticación:</strong> Corrección completa en los eventos de inicio de sesión y registro de usuarios.</li>
-                <li><strong>Perfiles y Avatares Locales:</strong> Subida de imágenes desde el dispositivo fija sin perderse al recargar.</li>
-                <li><strong>Modo Claro/Oscuro y Notificaciones:</strong> Funcionales al 100%.</li>
+                <li><strong>Diseño Ajustado:</strong> Botón de versión integrado junto al perfil de usuario (ya no tapa ningún elemento).</li>
+                <li><strong>Visibilidad en Móviles:</strong> Notificaciones y panel adaptados completamente para pantallas táctiles y pequeñas.</li>
+                <li><strong>Avatar Local Permanente:</strong> Conserva las imágenes de perfil sin desconfiguraciones.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
@@ -836,7 +843,10 @@
             </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="header-actions">
+            <!-- BOTÓN DE VERSIÓN AHORA JUNTO A NOTIFICACIONES -->
+            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.2.4 📜</button>
+
             <!-- CAMPANA DE NOTIFICACIONES -->
             <div class="notif-wrapper">
                 <button class="btn-bell" onclick="toggleNotifDropdown()">🔔 <span id="notif-badge" class="notif-badge">0</span></button>
@@ -1366,7 +1376,7 @@
             const isReclutador = currentUser.role.includes("Reclutador");
 
             if (isOwner || isLeader) {
-                document.getElementById("version-badge").style.display = "block";
+                document.getElementById("version-badge").style.display = "inline-block";
             } else {
                 document.getElementById("version-badge").style.display = "none";
             }
