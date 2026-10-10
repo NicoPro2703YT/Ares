@@ -842,10 +842,10 @@
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.3.0</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.3.1</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Evento Especial de Halloween:</strong> ¡Minijuego activo! Atrapa caramelos en 10 segundos, compite en el ranking global del clan y alcanza el podio.</li>
-                <li><strong>Penalización por Fallos:</strong> ¡Cuidado dónde haces clic! Fallar resta caramelos.</li>
+                <li><strong>Easter Egg de Halloween:</strong> ¡Posibilidad oculta (0.1% modificable desde Firebase) al atrapar un caramelo que te otorga +100 caramelos de golpe!</li>
+                <li><strong>Ranking y Competencia:</strong> Podio en tiempo real actualizado con la nube.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
@@ -945,7 +945,7 @@
 
         <div class="header-actions">
             <!-- BOTÓN DE VERSIÓN -->
-            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.3.0 🎃</button>
+            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.3.1 🎃</button>
 
             <!-- CAMPANA DE NOTIFICACIONES -->
             <div class="notif-wrapper">
@@ -1058,7 +1058,7 @@
 
                     <div id="game-start-screen" class="game-overlay-msg">
                         <h3 style="color: var(--orange-primary); margin-bottom: 10px;">¡Listo para el reto?</h3>
-                        <p style="font-size: 0.85em; color: var(--text-dim); margin-bottom: 15px;">Los caramelos aparecen y desaparecen rápido. ¡Demuestra quién manda en el clan!</p>
+                        <p style="font-size: 0.85em; color: var(--text-dim); margin-bottom: 15px;">¡Atrapa caramelos y busca el Easter Egg secreto! (0.1% de probabilidad)</p>
                         <button class="btn-submit" onclick="startHalloweenGame()">¡Empezar Juego!</button>
                     </div>
 
@@ -1212,6 +1212,16 @@
         let passRequests = {};
         let notifications = [];
         let currentUser = null;
+
+        // Configuración de Easter Egg sincronizada con la base de datos
+        let easterEggChance = 0.001; // 0.1% por defecto (0.001)
+        let easterEggBonus = 100;    // +100 caramelos por defecto
+
+        db.ref("config").on("value", snapshot => {
+            const cfg = snapshot.val() || {};
+            if (cfg.easterEggChance !== undefined) easterEggChance = parseFloat(cfg.easterEggChance);
+            if (cfg.easterEggBonus !== undefined) easterEggBonus = parseInt(cfg.easterEggBonus);
+        });
         
         try {
             currentUser = JSON.parse(localStorage.getItem("ares_current_session"));
@@ -1284,7 +1294,7 @@
             if (currentUser) renderAdminUserList();
         });
 
-        // LÓGICA DEL MINIJUEGO DE HALLOWEEN
+        // LÓGICA DEL MINIJUEGO DE HALLOWEEN CON EASTER EGG
         let gameActive = false;
         let gameScore = 0;
         let gameTimer = 10;
@@ -1303,7 +1313,6 @@
             document.getElementById("game-score-display").innerText = "Caramelos: 0";
             document.getElementById("game-timer-display").innerText = "Tiempo: 10s";
 
-            // Limpiar caramelos residuales
             document.querySelectorAll(".candy-item").forEach(el => el.remove());
 
             gameInterval = setInterval(() => {
@@ -1337,12 +1346,21 @@
             candy.onclick = function(e) {
                 e.stopPropagation();
                 if (!gameActive) return;
-                gameScore++;
+
+                // Comprobación de Easter Egg basada en Firebase
+                let pointsToAdd = 1;
+                let isEasterEgg = Math.random() < easterEggChance;
+
+                if (isEasterEgg) {
+                    pointsToAdd = easterEggBonus;
+                    addNotification(`🎉 ¡EASTER EGG! Has encontrado un caramelo legendario y ganado +${easterEggBonus} caramelos.`);
+                }
+
+                gameScore += pointsToAdd;
                 document.getElementById("game-score-display").innerText = `Caramelos: ${gameScore}`;
                 candy.remove();
             };
 
-            // Desaparecen solas con el tiempo (1.1 segundos)
             setTimeout(() => {
                 if (candy.parentElement) {
                     candy.remove();
@@ -1354,7 +1372,6 @@
 
         function handleBoardMiss(e) {
             if (!gameActive) return;
-            // Si hace clic en el tablero y no en un caramelo, resta 1
             gameScore = Math.max(0, gameScore - 1);
             document.getElementById("game-score-display").innerText = `Caramelos: ${gameScore}`;
         }
@@ -1368,7 +1385,6 @@
             document.getElementById("final-score-text").innerText = `¡Has conseguido ${gameScore} caramelos!`;
             document.getElementById("game-over-screen").style.display = "block";
 
-            // Guardar puntuación en Firebase
             if (currentUser) {
                 saveHalloweenScore(currentUser.username, gameScore);
             }
@@ -1388,7 +1404,6 @@
             });
         }
 
-        // Cargar y renderizar ranking de Halloween
         db.ref("halloweenRanking").on("value", snapshot => {
             const rankingData = snapshot.val() || {};
             const rankingListEl = document.getElementById("ranking-list");
