@@ -842,10 +842,10 @@
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.3.1</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.3.2</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Easter Egg de Halloween:</strong> ¡Posibilidad oculta (0.1% modificable desde Firebase) al atrapar un caramelo que te otorga +100 caramelos de golpe!</li>
-                <li><strong>Ranking y Competencia:</strong> Podio en tiempo real actualizado con la nube.</li>
+                <li><strong>Ogro Legendario de Halloween:</strong> ¡El Easter Egg secreto ahora aparece como el Ogro 👹! Haz clic en él cuando salga para conseguir tus +100 caramelos.</li>
+                <li><strong>Ajustes desde Firebase:</strong> Probabilidad y bonus modificables en tiempo real.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
@@ -945,7 +945,7 @@
 
         <div class="header-actions">
             <!-- BOTÓN DE VERSIÓN -->
-            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.3.1 🎃</button>
+            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.3.2 👹</button>
 
             <!-- CAMPANA DE NOTIFICACIONES -->
             <div class="notif-wrapper">
@@ -1045,7 +1045,7 @@
         <div id="tab-halloween" class="tab-content">
             <div class="rules-container" style="margin-bottom: 20px;">
                 <h2 style="color: var(--orange-primary); margin-bottom: 5px;">🎃 Caza de Caramelos - Halloween Ares</h2>
-                <p style="color: var(--text-dim); font-size: 0.9em;">Tienes exactamente <strong>10 segundos</strong> para recolectar la mayor cantidad de caramelos haciendo clic sobre ellos. ¡Pero ten cuidado! Si haces clic en el tablero vacío en lugar de un caramelo, <strong>perderás puntos</strong>.</p>
+                <p style="color: var(--text-dim); font-size: 0.9em;">Tienes exactamente <strong>10 segundos</strong> para recolectar la mayor cantidad de caramelos haciendo clic sobre ellos. ¡Atento si aparece el Ogro Secreto 👹 para conseguir un super bonus!</p>
             </div>
 
             <div class="halloween-container">
@@ -1058,7 +1058,7 @@
 
                     <div id="game-start-screen" class="game-overlay-msg">
                         <h3 style="color: var(--orange-primary); margin-bottom: 10px;">¡Listo para el reto?</h3>
-                        <p style="font-size: 0.85em; color: var(--text-dim); margin-bottom: 15px;">¡Atrapa caramelos y busca el Easter Egg secreto! (0.1% de probabilidad)</p>
+                        <p style="font-size: 0.85em; color: var(--text-dim); margin-bottom: 15px;">¡Atrapa caramelos y encuentra al Ogro Legendario 👹!</p>
                         <button class="btn-submit" onclick="startHalloweenGame()">¡Empezar Juego!</button>
                     </div>
 
@@ -1213,9 +1213,9 @@
         let notifications = [];
         let currentUser = null;
 
-        // Configuración de Easter Egg sincronizada con la base de datos
-        let easterEggChance = 0.001; // 0.1% por defecto (0.001)
-        let easterEggBonus = 100;    // +100 caramelos por defecto
+        // Configuración de Easter Egg sincronizada con Firebase
+        let easterEggChance = 0.001; // 0.1% por defecto
+        let easterEggBonus = 100;    // +100 caramelos
 
         db.ref("config").on("value", snapshot => {
             const cfg = snapshot.val() || {};
@@ -1294,7 +1294,7 @@
             if (currentUser) renderAdminUserList();
         });
 
-        // LÓGICA DEL MINIJUEGO DE HALLOWEEN CON EASTER EGG
+        // LÓGICA DEL MINIJUEGO DE HALLOWEEN
         let gameActive = false;
         let gameScore = 0;
         let gameTimer = 10;
@@ -1333,7 +1333,16 @@
             const board = document.getElementById("game-board");
             const candy = document.createElement("div");
             candy.className = "candy-item";
-            candy.innerText = candyIcons[Math.floor(Math.random() * candyIcons.length)];
+
+            // Determinar si sale el Easter Egg (Ogro 👹)
+            const isEasterEgg = Math.random() < easterEggChance;
+            
+            if (isEasterEgg) {
+                candy.innerText = "👹"; // Emoji del Ogro para el Easter Egg
+                candy.style.filter = "drop-shadow(0 0 10px #ff0000)";
+            } else {
+                candy.innerText = candyIcons[Math.floor(Math.random() * candyIcons.length)];
+            }
 
             const maxX = board.clientWidth - 50;
             const maxY = board.clientHeight - 80;
@@ -1347,16 +1356,13 @@
                 e.stopPropagation();
                 if (!gameActive) return;
 
-                // Comprobación de Easter Egg basada en Firebase
-                let pointsToAdd = 1;
-                let isEasterEgg = Math.random() < easterEggChance;
-
                 if (isEasterEgg) {
-                    pointsToAdd = easterEggBonus;
-                    addNotification(`🎉 ¡EASTER EGG! Has encontrado un caramelo legendario y ganado +${easterEggBonus} caramelos.`);
+                    gameScore += easterEggBonus;
+                    addNotification(`👹 ¡MISTER EGG CAPTURADO! Has atrapado al Ogro y ganado +${easterEggBonus} caramelos de golpe.`);
+                } else {
+                    gameScore += 1;
                 }
 
-                gameScore += pointsToAdd;
                 document.getElementById("game-score-display").innerText = `Caramelos: ${gameScore}`;
                 candy.remove();
             };
@@ -1991,3 +1997,4 @@
     </script>
 </body>
 </html>
+// Hecho por NicoPro2703
