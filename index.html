@@ -784,6 +784,19 @@
         .ranking-item.top-2 { border-left-color: #bdc3c7; background: rgba(189, 195, 199, 0.1); }
         .ranking-item.top-3 { border-left-color: #d35400; background: rgba(211, 84, 0, 0.1); }
 
+        .btn-delete-rank {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 8px;
+            transition: transform 0.2s;
+        }
+
+        .btn-delete-rank:hover {
+            transform: scale(1.2);
+        }
+
         /* --- DISEÑO MÓVIL OPTIMIZADO --- */
         @media (max-width: 768px) {
             header {
@@ -842,10 +855,10 @@
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.3.2</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.3.3</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Ogro Legendario de Halloween:</strong> ¡El Easter Egg secreto ahora aparece como el Ogro 👹! Haz clic en él cuando salga para conseguir tus +100 caramelos.</li>
-                <li><strong>Ajustes desde Firebase:</strong> Probabilidad y bonus modificables en tiempo real.</li>
+                <li><strong>Moderación de Ranking:</strong> Los usuarios con rango de Líder y Dueño ahora pueden eliminar puntuaciones del podio de Halloween.</li>
+                <li><strong>Mister Egg Configurable:</strong> Ogro 👹 habilitado con ajustes desde Firebase.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
@@ -945,7 +958,7 @@
 
         <div class="header-actions">
             <!-- BOTÓN DE VERSIÓN -->
-            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.3.2 👹</button>
+            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.3.3 👹</button>
 
             <!-- CAMPANA DE NOTIFICACIONES -->
             <div class="notif-wrapper">
@@ -1031,7 +1044,7 @@
                 <div class="rule-item"><div class="rule-title">14. Prohibición de mendicidad</div><div class="rule-desc">Queda prohibido pedir dinero solo por estar "pobre". Toda solicitud de fondos debe incluir una justificación válida de su uso (proyectos, compras específicas, etc).</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión temporal.</div></div>
                 <div class="rule-item"><div class="rule-title">15. Prohibido promocionar o crear otros servidores</div><div class="rule-desc">Está totalmente prohibido promocionar, publicitar o invitar a miembros del clan a otros servidores de Minecraft, así como crear servidores propios con la intención de competir o llevarse miembros del Clan Ares sin autorización.</div><div class="rule-punishment">Si lo rompes: Advertencia → Revisión → Mute temporal → Expulsión del clan.</div></div>
                 <div class="rule-item"><div class="rule-title">16. Prohibido mencionar</div><div class="rule-desc">Está prohibido mencionar (@mention) a Lider, Reclutadores o Dueños. Queda especialmente prohibido hacer menciones o mencionar repetidamente a una persona.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión del clan.</div></div>
-                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda estrictamente prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
+                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda strictly prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
             </div>
 
             <div id="info-other" class="rules-container" style="display: none;">
@@ -1338,7 +1351,7 @@
             const isEasterEgg = Math.random() < easterEggChance;
             
             if (isEasterEgg) {
-                candy.innerText = "👹"; // Emoji del Ogro para el Easter Egg
+                candy.innerText = "👹"; 
                 candy.style.filter = "drop-shadow(0 0 10px #ff0000)";
             } else {
                 candy.innerText = candyIcons[Math.floor(Math.random() * candyIcons.length)];
@@ -1410,6 +1423,14 @@
             });
         }
 
+        // ELIMINAR REGISTRO DE RANKING (SÓLO LÍDER O DUEÑO)
+        function deleteRankingUser(username) {
+            if (confirm(`¿Estás seguro de que deseas eliminar a ${username} del ranking de Halloween?`)) {
+                db.ref("halloweenRanking/" + username).remove();
+                addNotification(`El jugador ${username} ha sido eliminado del ranking.`);
+            }
+        }
+
         db.ref("halloweenRanking").on("value", snapshot => {
             const rankingData = snapshot.val() || {};
             const rankingListEl = document.getElementById("ranking-list");
@@ -1421,6 +1442,11 @@
                 return;
             }
 
+            // Verificar si el usuario actual es Dueño o Líder
+            const isOwner = currentUser && currentUser.username.toLowerCase() === "nicopro2703";
+            const isLeader = currentUser && currentUser.role && currentUser.role.includes("Líder");
+            const canManageRanking = isOwner || isLeader;
+
             rankingListEl.innerHTML = sortedScores.slice(0, 10).map((item, index) => {
                 let badgeClass = "";
                 let medalEmoji = `#${index + 1}`;
@@ -1428,10 +1454,17 @@
                 else if (index === 1) { badgeClass = "top-2"; medalEmoji = "🥈 2º"; }
                 else if (index === 2) { badgeClass = "top-3"; medalEmoji = "🥉 3º"; }
 
+                let deleteBtn = canManageRanking 
+                    ? `<button class="btn-delete-rank" onclick="deleteRankingUser('${item.username}')" title="Eliminar del Ranking">🗑️</button>` 
+                    : "";
+
                 return `
                     <li class="ranking-item ${badgeClass}">
                         <span><strong>${medalEmoji}</strong> ${item.username}</span>
-                        <span style="color: var(--orange-glow); font-weight: bold;">🍬 ${item.score}</span>
+                        <div>
+                            <span style="color: var(--orange-glow); font-weight: bold;">🍬 ${item.score}</span>
+                            ${deleteBtn}
+                        </div>
                     </li>
                 `;
             }).join("");
@@ -1997,4 +2030,3 @@
     </script>
 </body>
 </html>
-// Hecho por NicoPro2703
