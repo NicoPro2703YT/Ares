@@ -797,6 +797,54 @@
             transform: scale(1.2);
         }
 
+        /* --- ESTILOS QUIZ DE MATEMÁTICAS --- */
+        .quiz-card {
+            background: var(--card-bg);
+            border: 2px solid var(--purple);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.3);
+        }
+
+        .quiz-question {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--gold);
+            margin: 20px 0;
+            background: var(--header-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .quiz-answers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .quiz-btn {
+            background: var(--header-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-light);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .quiz-btn:hover {
+            border-color: var(--purple);
+            background: rgba(155, 89, 182, 0.2);
+            color: #fff;
+        }
+
         /* --- DISEÑO MÓVIL OPTIMIZADO --- */
         @media (max-width: 768px) {
             header {
@@ -855,10 +903,10 @@
     <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.3.3</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.4.0</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Moderación de Ranking:</strong> Los usuarios con rango de Líder y Dueño ahora pueden eliminar puntuaciones del podio de Halloween.</li>
-                <li><strong>Mister Egg Configurable:</strong> Ogro 👹 habilitado con ajustes desde Firebase.</li>
+                <li><strong>Duelo de Desempate (Quiz Matemático 🎃):</strong> En caso de empate en el ranking tras el 31 de Octubre, se habilita el quiz especial con sumas, restas, multiplicaciones, divisiones, potencias y raíces.</li>
+                <li><strong>Modo Pruebas Activado:</strong> Pestaña de duelo únicamente visible para el Owner y Líderes.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
@@ -958,7 +1006,7 @@
 
         <div class="header-actions">
             <!-- BOTÓN DE VERSIÓN -->
-            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.3.3 👹</button>
+            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.4.0 👹</button>
 
             <!-- CAMPANA DE NOTIFICACIONES -->
             <div class="notif-wrapper">
@@ -1008,6 +1056,7 @@
             <button class="tab-btn" onclick="switchMainTab('advertencias')">Advertencias</button>
             <button class="tab-btn" onclick="switchMainTab('informacion')">Información General</button>
             <button class="tab-btn" style="color:var(--orange-glow);" onclick="switchMainTab('halloween')">🎃 Evento Halloween</button>
+            <button class="tab-btn" id="tab-desempate-btn" style="display:none; color: var(--purple);" onclick="switchMainTab('desempate')">⚔️ Duelo Desempate</button>
             <button class="tab-btn" id="tab-admin-btn" style="display:none; color: var(--gold);" onclick="switchMainTab('admin')">Panel de Control</button>
         </div>
 
@@ -1044,7 +1093,7 @@
                 <div class="rule-item"><div class="rule-title">14. Prohibición de mendicidad</div><div class="rule-desc">Queda prohibido pedir dinero solo por estar "pobre". Toda solicitud de fondos debe incluir una justificación válida de su uso (proyectos, compras específicas, etc).</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión temporal.</div></div>
                 <div class="rule-item"><div class="rule-title">15. Prohibido promocionar o crear otros servidores</div><div class="rule-desc">Está totalmente prohibido promocionar, publicitar o invitar a miembros del clan a otros servidores de Minecraft, así como crear servidores propios con la intención de competir o llevarse miembros del Clan Ares sin autorización.</div><div class="rule-punishment">Si lo rompes: Advertencia → Revisión → Mute temporal → Expulsión del clan.</div></div>
                 <div class="rule-item"><div class="rule-title">16. Prohibido mencionar</div><div class="rule-desc">Está prohibido mencionar (@mention) a Lider, Reclutadores o Dueños. Queda especialmente prohibido hacer menciones o mencionar repetidamente a una persona.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Mute para 1 mes → Expulsión del clan.</div></div>
-                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda strictly prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
+                <div class="rule-item"><div class="rule-title">17. Prohibido el abandono de trabajos</div><div class="rule-desc">Queda estrictamente prohibido abandonar o cambiar una tarea asignada para iniciar otra sin previa autorización del dueño o líder.</div><div class="rule-punishment">Si lo rompes: Advertencia → Mute temporal → Revisión → Expulsión temporal.</div></div>
             </div>
 
             <div id="info-other" class="rules-container" style="display: none;">
@@ -1089,6 +1138,38 @@
                     <ul id="ranking-list" class="ranking-list">
                         <li style="color: var(--text-dim); text-align: center; padding: 15px;">Cargando ranking...</li>
                     </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA DESEMPATE / QUIZ MATEMÁTICO -->
+        <div id="tab-desempate" class="tab-content">
+            <div class="rules-container" style="margin-bottom: 20px;">
+                <h2 style="color: var(--purple); margin-bottom: 5px;">⚔️ Duelo de Desempate: Quiz Matemático 🎃</h2>
+                <p style="color: var(--text-dim); font-size: 0.9em;">Responde rápido a los problemas matemáticos. Cada acierto suma <strong>+1 punto</strong> y cada fallo resta <strong>-1 punto</strong>.</p>
+            </div>
+
+            <div class="quiz-card">
+                <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 15px;">
+                    <span id="quiz-score" style="color: var(--orange-glow);">Puntos: 0</span>
+                    <span id="quiz-timer" style="color: var(--gold);">Tiempo: 30s</span>
+                </div>
+
+                <div id="quiz-start-screen">
+                    <h3 style="color: var(--purple); margin-bottom: 10px;">Demuestra tu rapidez mental</h3>
+                    <p style="font-size: 0.85em; color: var(--text-dim); margin-bottom: 20px;">Operaciones: +, -, ×, ÷, Potencias ($x^2$, $x^3$) y Raíces ($\sqrt{x}$).</p>
+                    <button class="btn-submit" style="background: var(--purple);" onclick="startMathQuiz()">¡Iniciar Duelo!</button>
+                </div>
+
+                <div id="quiz-game-screen" style="display: none;">
+                    <div class="quiz-question" id="quiz-question-text">5 + 3 = ?</div>
+                    <div class="quiz-answers" id="quiz-options-container"></div>
+                </div>
+
+                <div id="quiz-end-screen" style="display: none;">
+                    <h3 style="color: var(--gold); margin-bottom: 10px;">¡Duelo Finalizado! 🏆</h3>
+                    <p id="quiz-final-result" style="font-size: 1.1em; font-weight: bold; margin-bottom: 20px;"></p>
+                    <button class="btn-submit" style="background: var(--purple);" onclick="startMathQuiz()">Reintentar Duelo</button>
                 </div>
             </div>
         </div>
@@ -1431,11 +1512,25 @@
             }
         }
 
+        let isTieActive = false;
+
         db.ref("halloweenRanking").on("value", snapshot => {
             const rankingData = snapshot.val() || {};
             const rankingListEl = document.getElementById("ranking-list");
 
             const sortedScores = Object.values(rankingData).sort((a, b) => b.score - a.score);
+
+            // COMPROBAR EMPATE TRAS EL 31 DE OCTUBRE
+            const currentDate = new Date();
+            const halloweenEnd = new Date("2026-10-31T23:59:59");
+            
+            if (sortedScores.length >= 2 && sortedScores[0].score === sortedScores[1].score) {
+                isTieActive = true;
+            } else {
+                isTieActive = false;
+            }
+
+            checkDesempateVisibility();
 
             if (sortedScores.length === 0) {
                 rankingListEl.innerHTML = "<li style='color: var(--text-dim); text-align: center; padding: 15px;'>Aún no hay registros. ¡Sé el primero!</li>";
@@ -1469,6 +1564,142 @@
                 `;
             }).join("");
         });
+
+        function checkDesempateVisibility() {
+            if (!currentUser) return;
+            const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
+            const isLeader = currentUser.role && currentUser.role.includes("Líder");
+
+            // Permitido en MODO PRUEBAS para Owner y Líderes, o si hay un empate real tras el 31 de Octubre
+            if (isOwner || isLeader || (isTieActive && new Date() > new Date("2026-10-31T23:59:59"))) {
+                document.getElementById("tab-desempate-btn").style.display = "inline-block";
+            } else {
+                document.getElementById("tab-desempate-btn").style.display = "none";
+            }
+        }
+
+        // LÓGICA DEL QUIZ DE MATEMÁTICAS (DESEMPATE)
+        let quizActive = false;
+        let quizScore = 0;
+        let quizTimer = 30;
+        let quizInterval = null;
+        let currentCorrectAnswer = 0;
+
+        function startMathQuiz() {
+            quizActive = true;
+            quizScore = 0;
+            quizTimer = 30;
+
+            document.getElementById("quiz-start-screen").style.display = "none";
+            document.getElementById("quiz-end-screen").style.display = "none";
+            document.getElementById("quiz-game-screen").style.display = "block";
+            document.getElementById("quiz-score").innerText = "Puntos: 0";
+            document.getElementById("quiz-timer").innerText = "Tiempo: 30s";
+
+            quizInterval = setInterval(() => {
+                quizTimer--;
+                document.getElementById("quiz-timer").innerText = `Tiempo: ${quizTimer}s`;
+
+                if (quizTimer <= 0) {
+                    endMathQuiz();
+                }
+            }, 1000);
+
+            generateMathQuestion();
+        }
+
+        function generateMathQuestion() {
+            const types = ['add', 'sub', 'mult', 'div', 'pow', 'sqrt'];
+            const chosenType = types[Math.floor(Math.random() * types.length)];
+
+            let num1, num2, questionText, answer;
+
+            switch(chosenType) {
+                case 'add':
+                    num1 = Math.floor(Math.random() * 50) + 1;
+                    num2 = Math.floor(Math.random() * 50) + 1;
+                    questionText = `${num1} + ${num2} = ?`;
+                    answer = num1 + num2;
+                    break;
+                case 'sub':
+                    num1 = Math.floor(Math.random() * 50) + 20;
+                    num2 = Math.floor(Math.random() * num1);
+                    questionText = `${num1} - ${num2} = ?`;
+                    answer = num1 - num2;
+                    break;
+                case 'mult':
+                    num1 = Math.floor(Math.random() * 12) + 2;
+                    num2 = Math.floor(Math.random() * 12) + 2;
+                    questionText = `${num1} × ${num2} = ?`;
+                    answer = num1 * num2;
+                    break;
+                case 'div':
+                    num2 = Math.floor(Math.random() * 10) + 2;
+                    answer = Math.floor(Math.random() * 10) + 2;
+                    num1 = num2 * answer;
+                    questionText = `${num1} ÷ ${num2} = ?`;
+                    break;
+                case 'pow':
+                    num1 = Math.floor(Math.random() * 10) + 2;
+                    const exp = Math.random() < 0.8 ? 2 : 3;
+                    questionText = `${num1}<sup>${exp}</sup> = ?`;
+                    answer = Math.pow(num1, exp);
+                    break;
+                case 'sqrt':
+                    answer = Math.floor(Math.random() * 12) + 2;
+                    num1 = answer * answer;
+                    questionText = `√${num1} = ?`;
+                    break;
+            }
+
+            currentCorrectAnswer = answer;
+            document.getElementById("quiz-question-text").innerHTML = questionText;
+
+            // Generar 4 opciones únicas
+            let options = [answer];
+            while(options.length < 4) {
+                let wrong = answer + (Math.floor(Math.random() * 10) - 5);
+                if (wrong !== answer && !options.includes(wrong) && wrong >= 0) {
+                    options.push(wrong);
+                }
+            }
+
+            // Mezclar opciones
+            options.sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById("quiz-options-container");
+            optionsContainer.innerHTML = "";
+
+            options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "quiz-btn";
+                btn.innerText = opt;
+                btn.onclick = () => handleQuizAnswer(opt);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function handleQuizAnswer(selectedOption) {
+            if (!quizActive) return;
+
+            if (selectedOption === currentCorrectAnswer) {
+                quizScore += 1;
+            } else {
+                quizScore -= 1;
+            }
+
+            document.getElementById("quiz-score").innerText = `Puntos: ${quizScore}`;
+            generateMathQuestion();
+        }
+
+        function endMathQuiz() {
+            quizActive = false;
+            clearInterval(quizInterval);
+
+            document.getElementById("quiz-game-screen").style.display = "none";
+            document.getElementById("quiz-end-screen").style.display = "block";
+            document.getElementById("quiz-final-result").innerText = `Puntuación Final: ${quizScore} Puntos`;
+        }
 
         function toggleVersionModal(show) {
             document.getElementById("version-modal").style.display = show ? "flex" : "none";
@@ -1725,6 +1956,7 @@
 
             updateServerView();
             checkAdminPermissions();
+            checkDesempateVisibility();
         }
 
         function changeServerOwner(serverVal) {
@@ -2014,7 +2246,7 @@
         }
 
         function switchMainTab(tabName) {
-            const tabs = ['anuncios', 'advertencias', 'informacion', 'halloween', 'admin'];
+            const tabs = ['anuncios', 'advertencias', 'informacion', 'halloween', 'desempate', 'admin'];
             tabs.forEach(t => {
                 const tabEl = document.getElementById("tab-" + t);
                 if (tabEl) tabEl.classList.remove("active");
