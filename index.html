@@ -1,8 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- 
+        ========================================================
+        PROPIEDAD Y AUTORÍA EXCLUSIVA
+        Desarrollado y administrado por: NicoPro2703
+        Clan Ares - Sitio Oficial (Verificación de Creador)
+        ========================================================
+    -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="NicoPro2703">
+    <meta name="owner" content="NicoPro2703">
     <title>Clan Ares - Sitio Oficial</title>
     
     <!-- SDK de Firebase -->
@@ -53,7 +62,6 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* --- INSIGNIA DE VERSIÓN INTEGRADA --- */
         .version-inline-btn {
             background: rgba(255, 102, 0, 0.15);
             border: 1px solid var(--orange-primary);
@@ -72,7 +80,6 @@
             color: #fff;
         }
 
-        /* --- CAMPANA DE NOTIFICACIONES --- */
         .notif-wrapper {
             position: relative;
             display: inline-block;
@@ -138,7 +145,6 @@
             border-bottom: none;
         }
 
-        /* --- MODALES --- */
         #version-modal, #rickroll-modal, #profile-modal {
             position: fixed;
             top: 0;
@@ -215,7 +221,6 @@
             cursor: not-allowed;
         }
 
-        /* PANTALLA LOGIN / REGISTRO */
         #auth-overlay {
             position: fixed;
             top: 0;
@@ -308,9 +313,16 @@
             transition: 0.3s;
         }
 
-        .btn-submit:hover {
+        .btn-submit:hover:not(:disabled) {
             background: var(--orange-glow);
             box-shadow: 0 0 10px var(--orange-glow);
+        }
+
+        .btn-submit:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
         .error-msg {
@@ -685,7 +697,6 @@
             gap: 10px;
         }
 
-        /* --- ESTILOS MINIJUEGO HALLOWEEN --- */
         .halloween-container {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -797,14 +808,24 @@
             transform: scale(1.2);
         }
 
-        /* --- ESTILOS QUIZ DE MATEMÁTICAS --- */
+        .quiz-container-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .quiz-container-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .quiz-card {
             background: var(--card-bg);
             border: 2px solid var(--purple);
             border-radius: 12px;
             padding: 30px;
-            max-width: 500px;
-            margin: 0 auto;
+            width: 100%;
             text-align: center;
             box-shadow: 0 0 20px rgba(155, 89, 182, 0.3);
         }
@@ -845,7 +866,6 @@
             color: #fff;
         }
 
-        /* --- DISEÑO MÓVIL OPTIMIZADO --- */
         @media (max-width: 768px) {
             header {
                 padding: 10px;
@@ -900,19 +920,17 @@
 </head>
 <body>
 
-    <!-- MODAL NOVEDADES DE LA VERSIÓN -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v1.4.0</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
+            <h3><span>Novedades v1.4.2</span> <span style="font-size:0.8em; color:var(--text-dim);">Octubre 2026</span></h3>
             <ul class="version-list">
-                <li><strong>Duelo de Desempate (Quiz Matemático 🎃):</strong> En caso de empate en el ranking tras el 31 de Octubre, se habilita el quiz especial con sumas, restas, multiplicaciones, divisiones, potencias y raíces.</li>
-                <li><strong>Modo Pruebas Activado:</strong> Pestaña de duelo únicamente visible para el Owner y Líderes.</li>
+                <li><strong>Corrección de Bugs Móviles:</strong> Solucionado el bloqueo de inicio de sesión por espacios accidentales o mayúsculas del teclado inteligente.</li>
+                <li><strong>Optimización de Audio:</strong> Solucionado el bug donde el vídeo del Rickroll se reproducía por sorpresa en segundo plano en dispositivos móviles.</li>
             </ul>
             <button class="btn-close-modal" onclick="toggleVersionModal(false)">Cerrar</button>
         </div>
     </div>
 
-    <!-- MODAL CONFIGURACIÓN DE PERFIL -->
     <div id="profile-modal">
         <div class="profile-card">
             <h3>Editar Mi Perfil</h3>
@@ -932,12 +950,12 @@
         </div>
     </div>
 
-    <!-- MODAL RICKROLL -->
+    <!-- MODAL RICKROLL CORREGIDO (PRELOAD NONE Y BLINDAJE DE AUDIO) -->
     <div id="rickroll-modal">
         <div class="rickroll-card">
             <h3 style="color:var(--orange-primary); margin-bottom:15px;">⚠️ ACCESO NO PERMITIDO</h3>
             <p style="font-size:0.9em; color:var(--text-dim); margin-bottom:15px;">Intentaste registrarte con el nombre del Clan/Dueño. Debes ver el video completo para poder reintentar con otro nombre.</p>
-            <video id="rickroll-video" width="100%" autoplay style="border-radius:8px; border:1px solid var(--orange-primary); pointer-events: none;">
+            <video id="rickroll-video" width="100%" preload="none" style="border-radius:8px; border:1px solid var(--orange-primary); pointer-events: none;">
                 <source src="videoplayback.mp4" type="video/mp4">
                 Tu navegador no soporta el reproductor de video.
             </video>
@@ -945,7 +963,6 @@
         </div>
     </div>
 
-    <!-- OVERLAY AUTENTICACIÓN -->
     <div id="auth-overlay">
         <div class="auth-card">
             <div style="margin-bottom:15px;">
@@ -1005,10 +1022,8 @@
         </div>
 
         <div class="header-actions">
-            <!-- BOTÓN DE VERSIÓN -->
-            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.4.0 👹</button>
+            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v1.4.2 👹</button>
 
-            <!-- CAMPANA DE NOTIFICACIONES -->
             <div class="notif-wrapper">
                 <button class="btn-bell" onclick="toggleNotifDropdown()">🔔 <span id="notif-badge" class="notif-badge">0</span></button>
                 <div id="notif-dropdown" class="notif-dropdown">
@@ -1103,7 +1118,6 @@
             </div>
         </div>
 
-        <!-- PESTAÑA EVENTO HALLOWEEN -->
         <div id="tab-halloween" class="tab-content">
             <div class="rules-container" style="margin-bottom: 20px;">
                 <h2 style="color: var(--orange-primary); margin-bottom: 5px;">🎃 Caza de Caramelos - Halloween Ares</h2>
@@ -1111,7 +1125,6 @@
             </div>
 
             <div class="halloween-container">
-                <!-- ÁREA DE JUEGO -->
                 <div class="game-board" id="game-board" onclick="handleBoardMiss(event)">
                     <div class="game-hud">
                         <span id="game-score-display">Caramelos: 0</span>
@@ -1131,7 +1144,6 @@
                     </div>
                 </div>
 
-                <!-- RANKING PODIO -->
                 <div class="ranking-card">
                     <h3 style="color: var(--gold); margin-bottom: 5px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">🏆 Podio de Halloween</h3>
                     <p style="font-size: 0.8em; color: var(--text-dim);">Top 3 mejores recolectores del clan</p>
@@ -1142,46 +1154,54 @@
             </div>
         </div>
 
-        <!-- PESTAÑA DESEMPATE / QUIZ MATEMÁTICO -->
         <div id="tab-desempate" class="tab-content">
             <div class="rules-container" style="margin-bottom: 20px;">
                 <h2 style="color: var(--purple); margin-bottom: 5px;">⚔️ Duelo de Desempate: Quiz Matemático 🎃</h2>
-                <p style="color: var(--text-dim); font-size: 0.9em;">Responde rápido a los problemas matemáticos. Cada acierto suma <strong>+1 punto</strong> y cada fallo resta <strong>-1 punto</strong>.</p>
+                <p style="color: var(--text-dim); font-size: 0.9em;">Responde rápido a los problemas matemáticos. Cada acierto suma <strong>+1 punto</strong> y cada fallo resta <strong>-1 punto</strong>. ¡Todo el clan puede ver las puntuaciones del duelo en directo!</p>
             </div>
 
-            <div class="quiz-card">
-                <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 15px;">
-                    <span id="quiz-score" style="color: var(--orange-glow);">Puntos: 0</span>
-                    <span id="quiz-timer" style="color: var(--gold);">Tiempo: 30s</span>
+            <div class="quiz-container-layout">
+                <div class="quiz-card">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 15px;">
+                        <span id="quiz-score" style="color: var(--orange-glow);">Puntos: 0</span>
+                        <span id="quiz-timer" style="color: var(--gold);">Tiempo: 30s</span>
+                    </div>
+
+                    <div id="quiz-start-screen">
+                        <h3 style="color: var(--purple); margin-bottom: 10px;">Demuestra tu rapidez mental</h3>
+                        <p style="font-size: 0.85em; color: var(--text-dim); margin-bottom: 20px;">Operaciones: +, -, ×, ÷, Potencias ($x^2$, $x^3$) y Raíces ($\sqrt{x}$).</p>
+                        <button id="btn-start-quiz-match" class="btn-submit" style="background: var(--purple);" onclick="startMathQuiz()">¡Iniciar Duelo!</button>
+                        <p id="quiz-restricted-msg" style="color: var(--red-alert); font-size: 0.85em; margin-top: 10px; display: none;">⚠️ Solo los jugadores empatados en el ranking de Halloween tienen acceso a jugar este duelo.</p>
+                    </div>
+
+                    <div id="quiz-game-screen" style="display: none;">
+                        <div class="quiz-question" id="quiz-question-text">5 + 3 = ?</div>
+                        <div class="quiz-answers" id="quiz-options-container"></div>
+                    </div>
+
+                    <div id="quiz-end-screen" style="display: none;">
+                        <h3 style="color: var(--gold); margin-bottom: 10px;">¡Duelo Finalizado! 🏆</h3>
+                        <p id="quiz-final-result" style="font-size: 1.1em; font-weight: bold; margin-bottom: 20px;"></p>
+                        <button class="btn-submit" style="background: var(--purple);" onclick="startMathQuiz()">Reintentar Duelo</button>
+                    </div>
                 </div>
 
-                <div id="quiz-start-screen">
-                    <h3 style="color: var(--purple); margin-bottom: 10px;">Demuestra tu rapidez mental</h3>
-                    <p style="font-size: 0.85em; color: var(--text-dim); margin-bottom: 20px;">Operaciones: +, -, ×, ÷, Potencias ($x^2$, $x^3$) y Raíces ($\sqrt{x}$).</p>
-                    <button class="btn-submit" style="background: var(--purple);" onclick="startMathQuiz()">¡Iniciar Duelo!</button>
-                </div>
-
-                <div id="quiz-game-screen" style="display: none;">
-                    <div class="quiz-question" id="quiz-question-text">5 + 3 = ?</div>
-                    <div class="quiz-answers" id="quiz-options-container"></div>
-                </div>
-
-                <div id="quiz-end-screen" style="display: none;">
-                    <h3 style="color: var(--gold); margin-bottom: 10px;">¡Duelo Finalizado! 🏆</h3>
-                    <p id="quiz-final-result" style="font-size: 1.1em; font-weight: bold; margin-bottom: 20px;"></p>
-                    <button class="btn-submit" style="background: var(--purple);" onclick="startMathQuiz()">Reintentar Duelo</button>
+                <div class="ranking-card">
+                    <h3 style="color: var(--purple); margin-bottom: 5px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">📊 Podio del Desempate</h3>
+                    <p style="font-size: 0.8em; color: var(--text-dim);">Puntuaciones oficiales del quiz</p>
+                    <ul id="tie-ranking-list" class="ranking-list">
+                        <li style="color: var(--text-dim); text-align: center; padding: 15px;">Cargando tabla de duelo...</li>
+                    </ul>
                 </div>
             </div>
         </div>
 
         <div id="tab-admin" class="tab-content">
-            <!-- CAJA DE SOLICITUDES DE CONTRASEÑA -->
             <div id="owner-requests-box">
                 <h3 style="color:var(--gold); font-size:1.1em; margin-bottom:5px;">🔔 Solicitudes de Permiso de Contraseña</h3>
                 <div id="requests-list"></div>
             </div>
 
-            <!-- PUBLICAR MENSAJE OFICIAL O EVENTO -->
             <div class="admin-box" id="publish-box">
                 <h3>Publicar Mensaje / Convocatoria Oficial</h3>
                 <div class="form-group">
@@ -1270,10 +1290,11 @@
     </main>
 
     <script>
-        // SILUETA GRIS POR DEFECTO PARA USUARIOS SIN FOTO
+        window.SITE_OWNER = "NicoPro2703";
+        console.log("%c Sitios e Infraestructura Digital del Clan Ares — Creado y Administrado exclusivamente por NicoPro2703 ", "background: #ff6600; color: #ffffff; font-weight: bold; font-size: 12px; padding: 4px; border-radius: 4px;");
+
         const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239ca3af'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
 
-        // BLOQUEO DE INSPECCIÓN
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', event => {
             if (event.key === "F12" || 
@@ -1283,7 +1304,6 @@
             }
         });
 
-        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyC1aM2DzLEYVaFyMhI7BYEAXk4E57sjM",
             authDomain: "clan-ares.firebaseapp.com",
@@ -1307,9 +1327,8 @@
         let notifications = [];
         let currentUser = null;
 
-        // Configuración de Easter Egg sincronizada con Firebase
-        let easterEggChance = 0.001; // 0.1% por defecto
-        let easterEggBonus = 100;    // +100 caramelos
+        let easterEggChance = 0.001; 
+        let easterEggBonus = 100;    
 
         db.ref("config").on("value", snapshot => {
             const cfg = snapshot.val() || {};
@@ -1331,11 +1350,9 @@
             localStorage.setItem("ares_device_ip", currentDeviceIP);
         }
 
-        // Aplicar tema guardado previamente
         const savedTheme = localStorage.getItem("ares_theme") || "dark";
         setTheme(savedTheme);
 
-        // Cuenta del dueño
         db.ref("users/NicoPro2703").set({
             username: "NicoPro2703",
             password: OWNER_PASS,
@@ -1345,7 +1362,6 @@
             theme: "dark"
         });
 
-        // Carga de datos
         db.ref("users").on("value", snapshot => {
             users = snapshot.val() || {};
             if (currentUser && users[currentUser.username]) {
@@ -1388,7 +1404,6 @@
             if (currentUser) renderAdminUserList();
         });
 
-        // LÓGICA DEL MINIJUEGO DE HALLOWEEN
         let gameActive = false;
         let gameScore = 0;
         let gameTimer = 10;
@@ -1428,7 +1443,6 @@
             const candy = document.createElement("div");
             candy.className = "candy-item";
 
-            // Determinar si sale el Easter Egg (Ogro 👹)
             const isEasterEgg = Math.random() < easterEggChance;
             
             if (isEasterEgg) {
@@ -1504,7 +1518,6 @@
             });
         }
 
-        // ELIMINAR REGISTRO DE RANKING (SÓLO LÍDER O DUEÑO)
         function deleteRankingUser(username) {
             if (confirm(`¿Estás seguro de que deseas eliminar a ${username} del ranking de Halloween?`)) {
                 db.ref("halloweenRanking/" + username).remove();
@@ -1513,6 +1526,7 @@
         }
 
         let isTieActive = false;
+        let tiedUsers = [];
 
         db.ref("halloweenRanking").on("value", snapshot => {
             const rankingData = snapshot.val() || {};
@@ -1520,12 +1534,11 @@
 
             const sortedScores = Object.values(rankingData).sort((a, b) => b.score - a.score);
 
-            // COMPROBAR EMPATE TRAS EL 31 DE OCTUBRE
-            const currentDate = new Date();
-            const halloweenEnd = new Date("2026-10-31T23:59:59");
-            
+            tiedUsers = [];
             if (sortedScores.length >= 2 && sortedScores[0].score === sortedScores[1].score) {
                 isTieActive = true;
+                const maxScore = sortedScores[0].score;
+                tiedUsers = sortedScores.filter(u => u.score === maxScore).map(u => u.username.toLowerCase());
             } else {
                 isTieActive = false;
             }
@@ -1537,7 +1550,6 @@
                 return;
             }
 
-            // Verificar si el usuario actual es Dueño o Líder
             const isOwner = currentUser && currentUser.username.toLowerCase() === "nicopro2703";
             const isLeader = currentUser && currentUser.role && currentUser.role.includes("Líder");
             const canManageRanking = isOwner || isLeader;
@@ -1565,20 +1577,56 @@
             }).join("");
         });
 
+        db.ref("tieQuizRanking").on("value", snapshot => {
+            const quizData = snapshot.val() || {};
+            const tieListEl = document.getElementById("tie-ranking-list");
+
+            const sortedQuiz = Object.values(quizData).sort((a, b) => b.score - a.score);
+
+            if (sortedQuiz.length === 0) {
+                tieListEl.innerHTML = "<li style='color: var(--text-dim); text-align: center; padding: 15px;'>Aún no hay enfrentamientos registrados.</li>";
+                return;
+            }
+
+            tieListEl.innerHTML = sortedQuiz.slice(0, 10).map((item, index) => {
+                let badgeClass = "";
+                let medalEmoji = `#${index + 1}`;
+                if (index === 0) { badgeClass = "top-1"; medalEmoji = "🥇 1º"; }
+                else if (index === 1) { badgeClass = "top-2"; medalEmoji = "🥈 2º"; }
+
+                return `
+                    <li class="ranking-item ${badgeClass}">
+                        <span><strong>${medalEmoji}</strong> ${item.username}</span>
+                        <span style="color: var(--purple); font-weight: bold;">⭐ ${item.score} pts</span>
+                    </li>
+                `;
+            }).join("");
+        });
+
         function checkDesempateVisibility() {
             if (!currentUser) return;
             const isOwner = currentUser.username.toLowerCase() === "nicopro2703";
             const isLeader = currentUser.role && currentUser.role.includes("Líder");
+            const isUserTied = tiedUsers.includes(currentUser.username.toLowerCase());
 
-            // Permitido en MODO PRUEBAS para Owner y Líderes, o si hay un empate real tras el 31 de Octubre
-            if (isOwner || isLeader || (isTieActive && new Date() > new Date("2026-10-31T23:59:59"))) {
+            if (isOwner || isLeader || isTieActive) {
                 document.getElementById("tab-desempate-btn").style.display = "inline-block";
             } else {
                 document.getElementById("tab-desempate-btn").style.display = "none";
             }
+
+            const startBtn = document.getElementById("btn-start-quiz-match");
+            const msgEl = document.getElementById("quiz-restricted-msg");
+
+            if (isOwner || isLeader || isUserTied) {
+                if (startBtn) startBtn.disabled = false;
+                if (msgEl) msgEl.style.display = "none";
+            } else {
+                if (startBtn) startBtn.disabled = true;
+                if (msgEl) msgEl.style.display = "block";
+            }
         }
 
-        // LÓGICA DEL QUIZ DE MATEMÁTICAS (DESEMPATE)
         let quizActive = false;
         let quizScore = 0;
         let quizTimer = 30;
@@ -1655,7 +1703,6 @@
             currentCorrectAnswer = answer;
             document.getElementById("quiz-question-text").innerHTML = questionText;
 
-            // Generar 4 opciones únicas
             let options = [answer];
             while(options.length < 4) {
                 let wrong = answer + (Math.floor(Math.random() * 10) - 5);
@@ -1664,7 +1711,6 @@
                 }
             }
 
-            // Mezclar opciones
             options.sort(() => Math.random() - 0.5);
 
             const optionsContainer = document.getElementById("quiz-options-container");
@@ -1699,6 +1745,24 @@
             document.getElementById("quiz-game-screen").style.display = "none";
             document.getElementById("quiz-end-screen").style.display = "block";
             document.getElementById("quiz-final-result").innerText = `Puntuación Final: ${quizScore} Puntos`;
+
+            if (currentUser) {
+                saveTieQuizScore(currentUser.username, quizScore);
+            }
+        }
+
+        function saveTieQuizScore(username, score) {
+            const quizRef = db.ref("tieQuizRanking/" + username);
+            quizRef.once("value", snapshot => {
+                const currentBest = snapshot.val() ? snapshot.val().score : -999;
+                if (score > currentBest) {
+                    quizRef.set({
+                        username: username,
+                        score: score,
+                        timestamp: Date.now()
+                    });
+                }
+            });
         }
 
         function toggleVersionModal(show) {
@@ -1755,7 +1819,6 @@
             }
         }
 
-        // GESTIÓN DE NOTIFICACIONES
         function addNotification(text) {
             notifications.unshift({ text: text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
             updateNotifUI();
@@ -1791,7 +1854,6 @@
             updateNotifUI();
         }
 
-        // LÓGICA DE RICKROLL BLINDADA
         const rickrollVideo = document.getElementById("rickroll-video");
 
         if (rickrollVideo) {
@@ -1836,12 +1898,13 @@
             document.getElementById("reg-error").style.display = "none";
         }
 
+        // LÓGICA DE LOGIN BLINDADA CONTRA ESPACIOS Y MAYÚSCULAS DEL MÓVIL
         function handleLogin(e) {
             e.preventDefault();
-            const usernameInput = document.getElementById("login-username").value.trim();
+            const usernameInput = document.getElementById("login-username").value.trim().toLowerCase();
             const passwordInput = document.getElementById("login-password").value.trim();
 
-            const foundUser = Object.values(users).find(u => u.username.toLowerCase() === usernameInput.toLowerCase() && u.password === passwordInput);
+            const foundUser = Object.values(users).find(u => u.username.toLowerCase() === usernameInput && u.password === passwordInput);
 
             if (foundUser) {
                 currentUser = foundUser;
