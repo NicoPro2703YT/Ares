@@ -873,8 +873,9 @@
     <!-- MODAL DE NOVEDADES DE VERSIÓN (EXCLUSIVO PARA NICOPRO2703) -->
     <div id="version-modal">
         <div class="version-card">
-            <h3><span>Novedades v2.0</span> <span style="font-size:0.8em; color:var(--text-dim);">Noviembre 2026</span></h3>
+            <h3><span>Novedades v2.1</span> <span style="font-size:0.8em; color:var(--text-dim);">Noviembre 2026</span></h3>
             <ul class="version-list">
+                <li><strong>Límite de 5 Intentos Diarios (Sopa de Letras):</strong> Ahora los usuarios disponen de exactamente 5 intentos por día para acertar la palabra oculta.</li>
                 <li><strong>Minijuego Sopa de Letras Diaria:</strong> Nueva pestaña para encontrar 1 palabra oculta al día (+1 punto por acierto) con ranking global del clan.</li>
                 <li><strong>Control Anti-Repetición:</strong> La palabra del día no se repite en días consecutivos (mínimo 2 días de separación).</li>
                 <li><strong>Advertencias Personalizables:</strong> Selector numérico para configurar sanciones (ej. 1/8, 3/5).</li>
@@ -975,7 +976,7 @@
 
         <div class="header-actions">
             <!-- BOTÓN DE VERSIÓN EXCLUSIVO PARA NICOPRO2703 -->
-            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v2.0 🧩</button>
+            <button id="version-badge" class="version-inline-btn" onclick="toggleVersionModal(true)">v2.1 🧩</button>
 
             <div class="notif-wrapper">
                 <button class="btn-bell" onclick="toggleNotifDropdown()">🔔 <span id="notif-badge" class="notif-badge">0</span></button>
@@ -1073,13 +1074,14 @@
         <div id="tab-sopadeletras" class="tab-content">
             <div class="rules-container" style="margin-bottom: 20px;">
                 <h2 style="color: var(--orange-primary); margin-bottom: 5px;">🧩 Sopa de Letras Diaria - Clan Ares</h2>
-                <p style="color: var(--text-dim); font-size: 0.9em;">Encuentra la <strong>única palabra secreta</strong> escondida en el tablero de hoy. Al encontrarla sumarás <strong>+1 punto</strong> y se bloqueará el tablero hasta mañana. ¡Mantén presionado y arrastra sobre las letras (horizontal, vertical o diagonal) o toca inicio y fin!</p>
+                <p style="color: var(--text-dim); font-size: 0.9em;">Encuentra la <strong>única palabra secreta</strong> escondida en el tablero de hoy. Tienes un máximo de <strong>5 intentos por día</strong>. Al encontrarla sumarás <strong>+1 punto</strong> y se completará el reto diario.</p>
             </div>
 
             <div class="wordsearch-layout">
                 <div class="wordsearch-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
                         <span id="ws-date-label" style="font-size:0.9em; color:var(--text-dim); font-weight:bold;">Reto de hoy</span>
+                        <span id="ws-user-attempts" style="background:rgba(231,76,60,0.15); border:1px solid var(--red-alert); color:var(--red-alert); padding:4px 10px; border-radius:12px; font-weight:bold; font-size:0.9em; margin-right:5px;">Intentos hoy: 5/5</span>
                         <span id="ws-user-points" style="background:rgba(255,102,0,0.15); border:1px solid var(--orange-primary); color:var(--orange-glow); padding:4px 10px; border-radius:12px; font-weight:bold; font-size:0.9em;">Tus Puntos: 0</span>
                     </div>
 
@@ -1968,14 +1970,30 @@
 
             generateWordSearchBoard(dayNumber, wsTargetWord);
 
-            // Comprobar en Firebase si el usuario ya completó el reto hoy
+            // Comprobar en Firebase los puntos y los intentos de hoy
             db.ref("wordSearchScores/" + currentUser.username).once("value", snapshot => {
-                const data = snapshot.val() || { points: 0, lastCompletedDate: "" };
+                const data = snapshot.val() || { points: 0, lastCompletedDate: "", attemptsDate: "", attemptsLeft: 5 };
                 document.getElementById("ws-user-points").innerText = "Tus Puntos: " + (data.points || 0);
+
+                let attemptsLeft = 5;
+                if (data.attemptsDate === todayStr) {
+                    attemptsLeft = data.attemptsLeft !== undefined ? data.attemptsLeft : 5;
+                } else {
+                    // Nuevo día, reiniciamos a 5 intentos
+                    db.ref("wordSearchScores/" + currentUser.username).update({
+                        attemptsDate: todayStr,
+                        attemptsLeft: 5
+                    });
+                }
+
+                updateAttemptsDisplay(attemptsLeft);
 
                 if (data.lastCompletedDate === todayStr) {
                     wsAlreadySolvedToday = true;
-                    lockWordSearchBoard(true);
+                    lockWordSearchBoard(true, "completed");
+                } else if (attemptsLeft <= 0) {
+                    wsAlreadySolvedToday = true;
+                    lockWordSearchBoard(true, "exhausted");
                 } else {
                     wsAlreadySolvedToday = false;
                     renderWordSearchGrid();
@@ -2137,6 +2155,20 @@
             highlightSelectedCells();
         }
 
+        function updateAttemptsDisplay(count) {
+            const el = document.getElementById("ws-user-attempts");
+            if (el) {
+                el.innerText = `Intentos hoy: ${count}/5`;
+                if (count <= 1) {
+                    el.style.color = "var(--red-alert)";
+                    el.style.borderColor = "var(--red-alert)";
+                } else {
+                    el.style.color = "var(--gold)";
+                    el.style.borderColor = "var(--gold)";
+                }
+            }
+        }
+
         function finishWsSelection() {
             wsIsDragging = false;
             if (wsAlreadySolvedToday || wsSelectedCells.length === 0) return;
@@ -2156,7 +2188,34 @@
                 awardDailyWordPoint();
             } else {
                 clearWordSelection();
+                consumeAttempt();
             }
+        }
+
+        function consumeAttempt() {
+            const todayStr = getTodayDateString();
+            const userRef = db.ref("wordSearchScores/" + currentUser.username);
+
+            userRef.once("value", snapshot => {
+                const data = snapshot.val() || { points: 0, attemptsDate: todayStr, attemptsLeft: 5 };
+                let currentAttempts = (data.attemptsDate === todayStr && data.attemptsLeft !== undefined) ? data.attemptsLeft : 5;
+                
+                currentAttempts = Math.max(0, currentAttempts - 1);
+                updateAttemptsDisplay(currentAttempts);
+
+                userRef.update({
+                    attemptsDate: todayStr,
+                    attemptsLeft: currentAttempts
+                });
+
+                if (currentAttempts <= 0) {
+                    wsAlreadySolvedToday = true;
+                    lockWordSearchBoard(true, "exhausted");
+                    addNotification("❌ Has agotado tus 5 intentos de hoy en la Sopa de Letras.");
+                } else {
+                    addNotification(`❌ Palabra incorrecta. Te quedan ${currentAttempts} intentos hoy.`);
+                }
+            });
         }
 
         function awardDailyWordPoint() {
@@ -2180,19 +2239,27 @@
             });
         }
 
-        function lockWordSearchBoard(alreadyDoneBefore) {
+        function lockWordSearchBoard(alreadyDoneBefore, mode = "completed") {
             renderWordSearchGrid();
-            wsSolutionCoords.forEach(pos => {
-                const cell = document.querySelector(`.ws-cell[data-r='${pos.r}'][data-c='${pos.c}']`);
-                if (cell) cell.classList.add("found");
-            });
+            if (mode === "completed") {
+                wsSolutionCoords.forEach(pos => {
+                    const cell = document.querySelector(`.ws-cell[data-r='${pos.r}'][data-c='${pos.c}']`);
+                    if (cell) cell.classList.add("found");
+                });
+            }
 
             const banner = document.getElementById("ws-status-banner");
-            banner.style.borderColor = "#2ecc71";
-            banner.style.background = "rgba(46, 204, 113, 0.15)";
-            banner.innerHTML = alreadyDoneBefore
-                ? `✅ <strong>¡Ya completaste la sopa de letras de hoy!</strong> Palabra encontrada: <span style="color:#2ecc71; font-weight:bold;">${wsTargetWord}</span>. Vuelve mañana para jugar de nuevo.`
-                : `🎉 <strong>¡FELICIDADES!</strong> Encontraste la palabra <span style="color:#2ecc71; font-weight:bold;">${wsTargetWord}</span> y ganaste <strong>+1 punto</strong>. Vuelve mañana para un nuevo reto.`;
+            if (mode === "exhausted") {
+                banner.style.borderColor = "var(--red-alert)";
+                banner.style.background = "rgba(231, 76, 60, 0.15)";
+                banner.innerHTML = `❌ <strong>¡Intentos agotados!</strong> Te has quedado sin intentos por hoy. Vuelve mañana para un nuevo reto.`;
+            } else {
+                banner.style.borderColor = "#2ecc71";
+                banner.style.background = "rgba(46, 204, 113, 0.15)";
+                banner.innerHTML = alreadyDoneBefore
+                    ? `✅ <strong>¡Ya completaste la sopa de letras de hoy!</strong> Palabra encontrada: <span style="color:#2ecc71; font-weight:bold;">${wsTargetWord}</span>. Vuelve mañana para jugar de nuevo.`
+                    : `🎉 <strong>¡FELICIDADES!</strong> Encontraste la palabra <span style="color:#2ecc71; font-weight:bold;">${wsTargetWord}</span> y ganaste <strong>+1 punto</strong>. Vuelve mañana para un nuevo reto.`;
+            }
         }
 
         db.ref("wordSearchScores").on("value", snapshot => {
